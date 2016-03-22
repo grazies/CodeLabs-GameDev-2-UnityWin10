@@ -48,7 +48,7 @@ This module includes the following exercises:
 Estimated time to complete this module: **60 minutes**
  
 <a name="Exercise1"></a> 
-### Exercise 1: Exporting with C# Projects ###
+### Exercise 1: Exporting Unity Project to Windows Store w/ C# Projects ###
 
 1. Open the **Ex1/Begin** Tanks project in Unity.
 
@@ -103,7 +103,7 @@ Estimated time to complete this module: **60 minutes**
 	- The **Assembly-Csharp** and **Assemby-CSharp** first pass projects is normally what Unity builds in the **Editor**. In this case, Unity generated them because we chose the option to create **Unity C# projects**. These will be handy for our lab as they allow us to rebuild the project (and game) from within Visual Studio without having to rebuild from Unity. Of course that works if all we modify is code (that goes into **Assembly-CSharp**); if we modify scenes, then we must rebuild from Unity. If you rebuild from Unity and output to same build folder, Unity will not override the code and settings for your games project (Tanks.csproj). Unity preserves these so that any changes you make to your solution are preserved. 
 
 <a name="Exercise2"></a> 
-### Exercise 2: Using Unity's native integration helpers ###
+### Exercise 2: Using Unity's native integration helper libraries ###
 
 For native integration, Unity includes a few wrappers for Windows Store features like tiles, toast notifications, and launchers.  These features are in the **UnityEngine.WSA** namespace.
 
@@ -162,7 +162,7 @@ Unfortunately, the APIs are also limited. They do not handle all native integrat
 
 
 <a name="Exercise3"></a> 
-### Exercise 3: Adding Inline Code to a Unity Game ###
+### Exercise 3: Adding WinRT inline code to a Unity game ###
 
 When Unity games target Windows Store (with a .NET backend, not IL2CPP), they are compiled using the .NET compiler and therefore can access WinRT APIs, since as part of the build process, Unity links against WinRT libraries.  
 
@@ -284,7 +284,7 @@ To see Vungle ads, just run the game and win two rounds. After the second round,
 You have now seen how easy it is to integrate a managed Unity plugin or a WinRT component into your Unity project. Plugins are a critical part of code/logic reuse and a great integration and extensibility point for games, as most games leverage shared analytics, ads, social networks, etc. All of these are powered by reusable plugins you will consume from Unity.   
 
 <a name="Exercise5"></a> 
-### Exercise 5: A bridge approach to integration ####
+### Exercise 5: Taking a bridge approach to integration ####
 
 This exercise is not yet written. 
 
