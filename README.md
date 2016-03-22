@@ -15,7 +15,7 @@ In this module, you will learn about these concepts:
 - Integrate with Windows 10 by inlining some code from within your Unity game 
 - Integrate with Windows 10 by writing and properly configuring Unity plugins 
  
-> **Note:** This module is optimized to show you integration techniques. Most of the Unity code (menus, event handlers) has been coded for you; you will need to inject the native code at right places, but the lab does not explain the 'glue' code we wrote in Unity. 
+> **Note:** This module is optimized to show you integration techniques. Most of the Unity code (menus, event handlers) has been coded for you; you will need to inject the native code at right places, but the module does not explain the 'glue' code we wrote in Unity. 
 > 
 > You will be able to walk through that on your own (as you have all the source), at your own leisure.
 > 
@@ -27,9 +27,9 @@ The following software is required to complete this module:
 
 - [Visual Studio Community 2015](https://www.visualstudio.com/products/visual-studio-community-vs) or greater
 - [Unity 5.3](http://unity3d.com/get-unity/update) or later
-- The 'starter' solution for this lab pre-downloaded. You can get it from [Microsoft-Build-2016/CodeLabs-GameDev-2-UnityWin10](https://github.com/Microsoft-Build-2016/CodeLabs-GameDev-2-UnityWin10.git) github repository.
+- The 'starter' solution for this module pre-downloaded. You can get it from [Microsoft-Build-2016/CodeLabs-GameDev-2-UnityWin10](https://github.com/Microsoft-Build-2016/CodeLabs-GameDev-2-UnityWin10.git) github repository.
 
-The following software packages are used within the lab. These can be optional, as you can choose to skip the steps, but are highly recommended for a comprehensive coverage of different approaches to integrate with Windows:  
+The following software packages are used within the module. These can be optional, as you can choose to skip the steps, but are highly recommended for a comprehensive coverage of different approaches to integrate with Windows:  
 
 - Vungle's Unity plugin. For _//build_ event, we have included this in the 'extra files' in the repo.  Post _//build_ event, you should get it from [Vungle's github repo](https://github.com/Vungle/Unity-Plugin)
 - [Microsoft Universal Ads SDK](https://visualstudiogallery.msdn.microsoft.com/401703a0-263e-4949-8f0f-738305d6ef4b )
@@ -100,7 +100,7 @@ Estimated time to complete this module: **60 minutes**
 
 	- **Package.appxmanifest** is the manifest (configuration file) for our project. In this file, you will find what we configured under **Player Settings** and **Build Settings** in Unity.
 
-	- The **Assembly-Csharp** and **Assemby-CSharp** first pass projects is normally what Unity builds in the **Editor**. In this case, Unity generated them because we chose the option to create **Unity C# projects**. These will be handy for our lab as they allow us to rebuild the project (and game) from within Visual Studio without having to rebuild from Unity. Of course that works if all we modify is code (that goes into **Assembly-CSharp**); if we modify scenes, then we must rebuild from Unity. If you rebuild from Unity and output to same build folder, Unity will not override the code and settings for your games project (Tanks.csproj). Unity preserves these so that any changes you make to your solution are preserved. 
+	- The **Assembly-Csharp** and **Assemby-CSharp** first pass projects is normally what Unity builds in the **Editor**. In this case, Unity generated them because we chose the option to create **Unity C# projects**. These will be handy for our mopdule as they allow us to rebuild the project (and game) from within Visual Studio without having to rebuild from Unity. Of course that works if all we modify is code (that goes into **Assembly-CSharp**); if we modify scenes, then we must rebuild from Unity. If you rebuild from Unity and output to same build folder, Unity will not override the code and settings for your games project (Tanks.csproj). Unity preserves these so that any changes you make to your solution are preserved. 
 
 <a name="Exercise2"></a> 
 ### Exercise 2: Using Unity's native integration helper libraries ###
