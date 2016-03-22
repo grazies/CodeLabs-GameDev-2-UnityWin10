@@ -13,12 +13,13 @@ public class SocialDialogManager : MonoBehaviour {
 	
 	}
 
-    public void OnRateClicked ()
-    {
-        // TODO: Add Code to link to store rating 
-        UnityEngine.WSA.Launcher.LaunchUri("ms-windows-store:REVIEW?PFN=Microsoft.Channel9_8wekyb3d8bbwe", false); 
-        DismissDialog(); 
-    }
+public void OnRateClicked ()
+{
+    //LAB_ANSWER_BEGIN  -- launch Windows store to rate our app. 
+    UnityEngine.WSA.Launcher.LaunchUri("ms-windows-store:REVIEW?PFN=Microsoft.Channel9_8wekyb3d8bbwe", false); 
+    //LAB_ANSWER_END 
+    DismissDialog(); 
+}
 
     public void OnShareClicked ()
     {

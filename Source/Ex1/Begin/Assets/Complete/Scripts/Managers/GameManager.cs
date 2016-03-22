@@ -1,6 +1,6 @@
-#define SHOW_VUNGLE_ADS  
+// #define SHOW_VUNGLE_ADS  
 // #define SHOW_MS_ADS  
- #define EASYPLAY 
+// #define EASYPLAY 
 
 using System.Collections;
 using UnityEngine;
@@ -139,19 +139,19 @@ namespace Complete
         }        
 #endif
 
-        void OnAdCompleted()
+void OnAdCompleted()
+{
+    m_isDisplayingAd = false;
+    if (!UnityEngine.WSA.Application.RunningOnAppThread())
+    {
+        UnityEngine.WSA.Application.InvokeOnAppThread(() =>
         {
-            m_isDisplayingAd = false;
-            if (!UnityEngine.WSA.Application.RunningOnAppThread())
-            {
-                UnityEngine.WSA.Application.InvokeOnAppThread(() =>
-                {
-                    ToggleMute(false);
-                }, false);
-            }
-            else
-                ToggleMute(false);
-        }
+            ToggleMute(false);
+        }, false);
+    }
+    else
+        ToggleMute(false);
+}
 
         void ShowAd ()
         {
@@ -450,42 +450,32 @@ namespace Complete
 
         void Update ()
         {
-///TODO: CODELAB STEP 
             if (Input.GetKeyUp(KeyCode.F1))
             {
-               UnityEngine.WSA.Launcher.LaunchUri("ms-windows-store:REVIEW?PFN=Microsoft.Channel9_8wekyb3d8bbwe", false); 
+                
             }
-
-//TODO: CODELAB STEP ... 
             else if (Input.GetKeyUp (KeyCode.F11))
             {
-#if NETFX_CORE && WINDOWS_UWP
-                //Dispatch from App to UI Thread 
-                UnityEngine.WSA.Application.InvokeOnUIThread( ()=>
-                {
-                    var appView = Windows.UI.ViewManagement.ApplicationView.GetForCurrentView();
-                    if (appView.IsFullScreen)
-                        appView.ExitFullScreenMode(); 
-                    else
-                        appView.TryEnterFullScreenMode(); 
-                } , false); 
-#endif
+
             }
         }
 
         void SetLiveTile ( string s )
         {                          
-            UnityEngine.WSA.Tile.main.Update( "ms-appx:///Data/StreamingAssets/TanksIcon_150x150.png" ,
-                "ms-appx:///Data/StreamingAssets/TanksIcon_310x150.png", string.Empty, s);             
+                         
         }
         void OnApplicationPause(bool paused)
         {             
             if (paused)
             {
+#if SHOW_VUNGLE_ADS
                 Vungle.onPause();
+#endif 
             }
             else {
+#if SHOW_VUNGLE_ADS
                 Vungle.onResume();
+#endif 
             }                      
         }
 

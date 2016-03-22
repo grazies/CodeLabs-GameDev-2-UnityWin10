@@ -8,7 +8,7 @@ PlayerSettings:
   defaultScreenOrientation: 4
   targetDevice: 2
   useOnDemandResources: 0
-  accelerometerFrequency: 60
+  accelerometerFrequency: 0
   companyName: Samples
   productName: Tanks
   defaultCursor: {fileID: 0}
@@ -491,7 +491,7 @@ PlayerSettings:
   WebGL::emscriptenArgs: 
   WebGL::template: APPLICATION:Default
   additionalIl2CppArgs::additionalIl2CppArgs: 
-  cloudProjectId: 22b11485-9297-4dc8-98b3-b4fa40a3d72a
-  projectName: e75f467238349b044aa2bf6168205914
-  organizationId: jamesb
+  cloudProjectId: 
+  projectName: 
+  organizationId: 
   cloudEnabled: 0

@@ -1,5 +1,5 @@
 // #define SHOW_VUNGLE_ADS  
-#define SHOW_MS_ADS  
+// #define SHOW_MS_ADS  
 // #define EASYPLAY 
 
 using System.Collections;
@@ -450,16 +450,17 @@ namespace Complete
 
         void Update ()
         {
-///TODO: CODELAB STEP 
             if (Input.GetKeyUp(KeyCode.F1))
             {
-               UnityEngine.WSA.Launcher.LaunchUri("ms-windows-store:REVIEW?PFN=Microsoft.Channel9_8wekyb3d8bbwe", false); 
-            }
-
-//TODO: CODELAB STEP ... 
+            //LAB_ANSWER_BEGIN 
+               UnityEngine.WSA.Launcher.LaunchUri("ms-windows-store:REVIEW?PFN=Microsoft.Channel9_8wekyb3d8bbwe", false);
+            //LAB_ANSWER_END 
+            } 
             else if (Input.GetKeyUp (KeyCode.F11))
             {
+//LAB_ANSWER_BEGIN 
 #if NETFX_CORE && WINDOWS_UWP
+
                 //Dispatch from App to UI Thread 
                 UnityEngine.WSA.Application.InvokeOnUIThread( ()=>
                 {
@@ -470,6 +471,7 @@ namespace Complete
                         appView.TryEnterFullScreenMode(); 
                 } , false); 
 #endif
+//LAB_ANSWER_END 
             }
         }
 
@@ -482,10 +484,14 @@ namespace Complete
         {             
             if (paused)
             {
+#if SHOW_VUNGLE_ADS 
                 Vungle.onPause();
+#endif 
             }
             else {
+#if SHOW_VUNGLE_ADS
                 Vungle.onResume();
+#endif 
             }                      
         }
 
