@@ -92,9 +92,10 @@ void Update ()
 { 
 	if (Input.GetKeyUp(KeyCode.F1))
     {
-       		UnityEngine.WSA.Launcher.LaunchUri("ms-windows-store:REVIEW?PFN=Microsoft.Channel9_8wekyb3d8bbwe", false); 
-    }
- 		...
+       	UnityEngine.WSA.Launcher.LaunchUri("ms-windows-store:REVIEW?PFN=Microsoft.Channel9_8wekyb3d8bbwe", 
+				false); 
+    } 
+	...
 } 
 ```
                  
@@ -115,8 +116,11 @@ public void OnRateClicked ()
 3. For our final example of this technique, and to illustrate a little more immersive integration, let's add live tiles to our game.  At the end of each round, we can add a teaser message so users can come back if they quit game in middle of a round. Our game already has a **SetLiveTile** method that gets called at end of each round.  This method will update the text on our main live tile, and set an image (to make pop with more interactivity).   
 
 ```C# 
-	UnityEngine.WSA.Tile.main.Update( "ms-appx:///Data/StreamingAssets/TanksIcon_150x150.png" ,
-            "ms-appx:///Data/StreamingAssets/TanksIcon_310x150.png", string.Empty, textmessage);             
+void SetLiveTile ( string textmessage )
+{                                                    
+    UnityEngine.WSA.Tile.main.Update( "ms-appx:///Data/StreamingAssets/TanksIcon_150x150.png" ,
+         "ms-appx:///Data/StreamingAssets/TanksIcon_310x150.png", string.Empty, textmessage);              
+}             
 ```
 
 #### Show Me!####
@@ -214,8 +218,8 @@ To save you a little typing time (and since the logic is simple and not critical
     - In the **Start** function,  we initialize Vungle and subscribe to adCompleted event:
 <!-- --> 
 ```C#
-			Vungle.init("com.prime31.Vungle", "vungleTest", "vungleTest");
-            Vungle.onAdFinishedEvent += OnAdFinished;  
+	Vungle.init("com.prime31.Vungle", "vungleTest", "vungleTest");
+    Vungle.onAdFinishedEvent += OnAdFinished;  
 ```
     - Within OnAdFinished, we call OnAdCompleted ()
     - Within OnAdCompleted we will reset the volume (since game background music gets muted prior to playing the ads). This OnAdCompleted event is worth looking at because it demonstrates using  **UnityEngine.WSA.Application.InvokeOnAppThread()** to unmute the background music.
