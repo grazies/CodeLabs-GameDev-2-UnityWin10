@@ -1,4 +1,4 @@
-<a name="HOLTop" ></a> 
+﻿<a name="HOLTop" ></a> 
 # Integrating Unity Games With Windows 10#
  
 
@@ -235,54 +235,55 @@ If you want to dive deeper into plugins within Unity, please see this [reference
 
 	 - Notice the files are under a **Plugins/Metro** folder structure. Unity follows a specific folder hierarchy and naming convention, with a folder name for each different target platform. Starting with Unity 5, the folder hierarchy is not required, as Unity allows you to configure it manually via the new Plugin inspector, but for ease of use, it is still handy to follow. You can find out more about these folder names in Unity's [Plugin Inspector documentation](http://docs.unity3d.com/Manual/PluginInspector.html).
 
-	 - There is a **UWP** folder. This is used for plugins for Universal (Windows 10) Projects. 
+	 - There is a **UWP** folder. This is used for plugins for Universal (Windows 10) Projects.
 
 	 - There is a **WindowsPhone81** folder, since the plugin supports phone 8.1. We are not going to need that today, so <u>remove that Windows Phone 81 folder and its contents</u>.
 
-    Let's now configure the rest of our SDK reference, pay close attention as there is a lot to learn here: 
+1. Let's now configure the rest of our SDK reference, pay close attention as there is a lot to learn here. Go to the **Plugins** Folder and notice the **VungleSDKProxy.dll.** This DLL since is at the root of the plugins folder right now is applicable to all platforms. Click the dll to see it's import settings, ensure the plugin's selected platform is Editor. This will be used only when running in the Editor. 
 
-1. Go to the **Plugins** Folder and notice the VungleSDKProxy.dll. This DLL since is at the root of the plugins folder right now is applicable to all platforms. Click on the dll to see it's import settings, ensure the plugin's selected platform is Editor.  This will be used only when running in the Editor. 
+	![VungleSDKProxy Import Settings](./Images/VungleSDKProxy.png "VungleSDKProxy Import Settings")
 
-![](./Images/VungleSDKProxy.png)
+	_VungleSDKProxy Import Settings_
+
+1. Next, we can go into the **Plugins\Metro** folder and configure the **VungleSDKProxy.winmd**.
+	- This winmd needs to target **WSAPlayer** (the platform for Windows Store). 
+	- You can leave any SDK or since we are only targeting UWP, select **UWP** under SDK.
+	- The Scripting Backend should be **Dotnet**
+	- Check the "Don't process" checkbox.  Don't process is used to tell Unity that it should not patch the assembly. Unity needs to do extra processing to patch assemblies that have classes serializable in Unity (most often monobehaviours); for most managed plugins that just integrate with platforms and bring helper classes, the Don't process should be checked. To be 100% accurate, the setting is not required since we have a .winmd, and not a .dll, but i wanted to explain the setting, so leave it checked. 
+	- For placeholder, point it to the VungleSDKProxy in the **Plugins** folder. This tells Unity to use that placeholder assembly within editor, but not at run-time. We need placeholder assemblies because the Unity Editor is running Mono, so it can't load .NET 4.5 assemblies. Placeholders mimic the APIs on the assembly we want to use, but are compiled against .NET 3.5.   Here is our settings for our VungleSDKProxy in Plugins\Metro. 
+
+	![VungleSDKProxy.winmd Import Settings](./Images/VungleSDKProxyPluginsMetro.png "VungleSDKProxy.winmd Import Settings")
+
+	_VungleSDKProxy.winmd Import Settings_
+
+1. Next, we can configure **VungleSDK.winmd** in **Plugins\Metro\UWP** using these settings.
+
+	![VungleSDK for UWP Import Settings](./Images/VungleSDKPluginsMetroUWP.png "VungleSDK for UWP Import Settings")
+
+	_VungleSDK for UWP Import Settings_
+
+	> **Note 1:** If you are wondering why VungleSDK does not have a placeholder, it does not need it. All possible calls to this assembly are 'brokered' through VungleSDKProxy, so we don't need a placeholder dll for this.  
+
+	> **Note 2:** That is it, we have now configured all our plugin references. If you want more details around these plugin import settings, Unity's documentation has a [good overview of the import settings](http://docs.unity3d.com/Manual/windowsstore-plugins.html). 
+
+1. By adding the Vungle plugin to our Unity project we have changed what Unity needs to compile, so before we go further, we should **Build** within Unity like we did on our first task. By default, we would let Unity target the same folder we used earlier. What Unity would do here is update our C# projects (**Assembly-CSharp** and **Assembly-CSharp-firstpass**) and rebuild the game with all scripts and the new assets. It will however **not** update our UWP project, because once Unity outputs it once, it does not override the .csproj, the XAML and C# files, etc. Of course this is a problem, as we need for our project to have the new references (_to VungleSDK.winmd_). To get around this hiccup, we can do one of two options:
+
+	- Since we had not made any changes to the project exported by Unity, we can just build to a different folder, and have it create a new project we use. 
+
+	- We can edit the _unityoverwrite.txt_ file in our previously exported folder (Task1) and delete the line that has Tanks.csproj. The line looks like the one below (though your hash will be different). Again you should delete it and save your _unityoverwrite.txt_ file. 
+
+		````
+		Tanks\Tanks.csproj: 49CB64084B043D447B36B13D5F2CF44D
+		````
+
+1. Now we can **Build** and Unity will overwrite the .csproj and include our new references. Of course, in the real-world if you had modified .csproj by adding more files or changing other settings you would have to merge it. The file is xml, so it is easy to compare and merge.
+
+1. After Unity re-exports, confirm the new _Tanks.csproj_ has a reference to **VungleSDK** and **VungleSDKProxy**; if that looks right, rebuild all just to ensure it is all working correctly.
 
 
-2. Next, we can go into the **Plugins\Metro** folder and configure the **VungleSDKProxy.winmd**
-    - This winmd needs to target **WSAPlayer** (the platform for Windows Store). 
-    - You can leave any SDK or since we are only targeting UWP, select **UWP** under SDK.
-    - The Scripting Backend should be **Dotnet**
-    - Check the "Don't process" checkbox.  Don't process is used to tell Unity that it should not patch the assembly. Unity needs to do extra processing to patch assemblies that have classes serializable in Unity (most often monobehaviours); for most managed plugins that just integrate with platforms and bring helper classes, the Don't process should be checked. To be 100% accurate, the setting is not required since we have a .winmd, and not a .dll, but i wanted to explain the setting, so leave it checked. 
-    - For placeholder, point it to the VungleSDKProxy in the **Plugins** folder. This tells Unity to use that placeholder assembly within editor, but not at run-time. We need placeholder assemblies because the Unity Editor is running Mono, so it can't load .NET 4.5 assemblies. Placeholders mimic the APIs on the assembly we want to use, but are compiled against .NET 3.5.   Here is our settings for our VungleSDKProxy in Plugins\Metro. 
+1. Now that we have our references configured within Unity and have recompiled, we can call the code to show the ads. Let's go back to Visual Studio.
 
-    ![](./Images/VungleSDKProxyPluginsMetro.png)
-
-
-3. Next, we can configure **VungleSDK.winmd** in **Plugins\Metro\UWP** using these settings
-
-     ![](./Images/VungleSDKPluginsMetroUWP.png)
-
-> Note: If you are wondering why VungleSDK does not have a placeholder, it does not need it. All possible calls to this assembly are 'brokered' through VungleSDKProxy, so we don't need a placeholder dll for this.  
-
-That is it, we have now configured all our plugin references. If you want more details around these plugin import settings, Unity's documentation has a [good overview of the import settings](http://docs.unity3d.com/Manual/windowsstore-plugins.html). 
-
-3. By adding the Vungle plugin to our Unity project we have changed what Unity needs to compile, so before we go further, we should **Build** within Unity like we did on our first task. By default, we would let Unity target the same folder we used earlier. What Unity would do here is update our C# projects (**Assembly-CSharp** and **Assembly-CSharp-firstpass**) and rebuild the game with all scripts and the new assets. It will however **not** update our UWP project, because once Unity outputs it once, it does not override the .csproj, the XAML and C# files, etc. Of course this is a problem, as we need for our project to have the new references (to VungleSDK.winmd)
-To get around this hiccup, we can do one of two options: 
-    - Since we had not made any changes to the project exported by Unity, we can just build to a different folder, and have it create a new project we use. 
-    - We can edit the unityoverwrite.txt file in our previously exported folder (Task1) and delete the line that has Tanks.csproj.  The line looks like the one below (though your hash will be different). Again you should delete it and save your unityoverwrite.txt file. 
-
-```C#
-Tanks\Tanks.csproj: 49CB64084B043D447B36B13D5F2CF44D
-```
-
-    - Now we can **Build** and Unity will overwrite the .csproj and include our new references. Of course, in the real-world if you had modified .csproj by adding more files or changing other settings you would have to merge it. The file is xml, so it is easy to compare and merge.
-
-    - After Unity re-exports, confirm the new Tanks.csproj has a reference to VungleSDK and VungleSDKProxy; if that looks right, rebuild all just to ensure it is all working correctly.   
-
-
-1. Now that we have our references configured within Unity and have recompiled, we can call the code to show the ads. Let's go back to Visual Studio. 
-
-To save you a little typing time (and since the logic is simple and not critical to Windows integration, the code is written, but excluded via a `#if USE_VUNGLE_ADS` pre-processors.
-
-1. Go to the top of the GameManager.cs file, and uncomment out the `#define USE_VUNGLE_ADS` line.
+1. To save you a little typing time (and since the logic is simple and not critical to Windows integration, the code is written, but excluded via a `#if USE_VUNGLE_ADS` pre-processors. Go to the top of the **GameManager.cs** file, and uncomment out the `#define USE_VUNGLE_ADS` line.
 
 1. Let's now review how Vungle is getting called. In the **Start** function,  we initialize Vungle and subscribe to adCompleted event.
 
@@ -325,96 +326,104 @@ You have now seen how easy it is to integrate a managed Unity plugin or a WinRT 
 <a name="Exercise5"></a> 
 ### Exercise 5: Taking a bridge approach to integration ####
 
-In the previous example, we consumed a plugin from within Unity by importing the binary (VungleSDK.winmd) into Unity and linking to it. Sometimes, we don't want to do this due to dependencies/relationships between the host app (in this case our Tanks UWP project) and Unity, or maybe the binaries & dependencies would be too cumbersome (often this happens if you have an SDK that ships as a nuget package and has a lot of dependencies) or ships as a VSIX. For those situations, we use the standard software development [bridge pattern](https://en.wikipedia.org/wiki/Bridge_pattern) where we can put an abstraction (often an interface) on the Unity side and then leave the implementation to the target host project generated by Unity. Let's illustrate that by replacing our Vungle ads with Microsoft ads on our project.
+In the previous example, we consumed a plugin from within Unity by importing the binary (_VungleSDK.winmd_) into Unity and linking to it. Sometimes, we don't want to do this due to dependencies/relationships between the host app (in this case our Tanks UWP project) and Unity, or maybe the binaries & dependencies would be too cumbersome (often this happens if you have an SDK that ships as a nuget package and has a lot of dependencies) or ships as a VSIX. For those situations, we use the standard software development [bridge pattern](https://en.wikipedia.org/wiki/Bridge_pattern) where we can put an abstraction (often an interface) on the Unity side and then leave the implementation to the target host project generated by Unity. Let's illustrate that by replacing our Vungle ads with Microsoft ads on our project.
 
-The code has already been typed for you, it is just hidden under `#if SHOW_MS_ADS` pre-processors, so to run this scenario, comment out the `#define SHOW_VUNGLE_ADS` at the top of game manager and uncomment out the `#define SHOW_MS_ADS`
+The code has already been typed for you, it is just hidden under `#if SHOW_MS_ADS` pre-processors, so to run this scenario, comment out the `#define SHOW_VUNGLE_ADS` at the top of game manager and uncomment out the `#define SHOW_MS_ADS`.
 
-```C# 
+````C# 
 // #define SHOW_VUNGLE_ADS  
 #define SHOW_MS_ADS
-``` 
+````
+
 Let's now review the implementation details on the Unity side.  
 
-1. We first need an abstraction to the APIs we want to call. In this case, there is an interface typed for us in CodeLab\MSAdsBridge\IMicrosoftAdsBridge.cs
-```C# 
-public interface IInterstittialAd : IDisposable
-{
+1. We first need an abstraction to the APIs we want to call. In this case, there is an interface typed for us in **CodeLab\MSAdsBridge\IMicrosoftAdsBridge.cs**.
 
-    void AddCallback(AdCallback type, Action<object> cb);
-    void ClearCallback(AdCallback type);
+	````C# 
+	public interface IInterstittialAd : IDisposable
+	{
+		 void AddCallback(AdCallback type, Action<object> cb);
+		 void ClearCallback(AdCallback type);
 
-    void RequestAndShow(string appId, string adUnitId);
+		 void RequestAndShow(string appId, string adUnitId);
 
-    void Request(string appId, string adUnitId, AdType type);
+		 void Request(string appId, string adUnitId, AdType type);
 
-    void Show();
-    InterstitialAdState State { get; }
-}
-``` 
-2. Next, we need a factory (or any other way to connect our abstraction to our concrete implementation). 
-```C# 
-public class MicrosoftAdsBridge
-{
-    public static IInterstitialAdFactory InterstitialAdFactory { get; set; }
-}
-public interface IInterstitialAdFactory
-{
-    IInterstittialAd CreateAd();
+		 void Show();
+		 InterstitialAdState State { get; }
+	}
+	````
 
-    IInterstittialAd CreateAd( 	Action<object> readyCallback, 
-								Action<object> completedCallback, 
-								Action<object> cancelledCallback,
-        						Action<object> errorCallback );
-}
-```
-3. Within Unity, we just check to see if we have a valid Factory when we want to instantiate our ads. We do this in **GameManager**'s **Start** method like we did for Vungle ads.  The most important code here is the check to see if we have a factory. 
+1. Next, we need a factory (or any other way to connect our abstraction to our concrete implementation).
 
-<!-- language: lang-cs --> 
-```C# 
-if (Microsoft.UnityPlugins.MicrosoftAdsBridge.InterstitialAdFactory != null)
-{
-    m_showAds = true;
-    m_MicrosoftAd = Microsoft.UnityPlugins.MicrosoftAdsBridge.InterstitialAdFactory.CreateAd();
-    m_MicrosoftAd.AddCallback(Microsoft.UnityPlugins.AdCallback.Completed, OnMSAdCompleted);
-    m_MicrosoftAd.AddCallback(Microsoft.UnityPlugins.AdCallback.Cancelled, OnMSAdCancelled);
-    m_MicrosoftAd.AddCallback(Microsoft.UnityPlugins.AdCallback.Error, OnMSAdError);
-    m_MicrosoftAd.Request(MicrosoftAdsAppId, NextMicrosoftAd, Microsoft.UnityPlugins.AdType.Video); 
-}
-```
+	````C# 
+	public class MicrosoftAdsBridge
+	{
+		 public static IInterstitialAdFactory InterstitialAdFactory { get; set; }
+	}
 
-Once ad is initialized, we can play the video on the same ShowAd method as before:
-```C# 
-if (m_MicrosoftAd != null)
-{
-    if (m_MicrosoftAd.State == Microsoft.UnityPlugins.InterstitialAdState.Ready)
-        m_MicrosoftAd.Show();
-    else
-        m_MicrosoftAd.RequestAndShow(MicrosoftAdsAppId, NextMicrosoftAd);
-}
-```
-As you can see, with the above we have code to instantiate ads and play ads, yet we have not added a reference to the Microsoft Ads SDK. Unity is completely abstracted/isolated from this.  We now need to add the implementation on the UWP project. 
+	public interface IInterstitialAdFactory
+	{
+		 IInterstittialAd CreateAd();
 
-1. In Visual studio, in our Tanks project, add a reference to the Microsoft Universal Ads SDK. 
-![](./Images/VisualStudioAddAdsReference.png)
+		 IInterstittialAd CreateAd( Action<object> readyCallback, 
+									Action<object> completedCallback, 
+									Action<object> cancelledCallback,
+									Action<object> errorCallback );
+	}
+	````
+
+1. Within Unity, we just check to see if we have a valid Factory when we want to instantiate our ads. We do this in **GameManager**'s **Start** method like we did for Vungle ads. The most important code here is the check to see if we have a factory. 
+
+	````C# 
+	if (Microsoft.UnityPlugins.MicrosoftAdsBridge.InterstitialAdFactory != null)
+	{
+		 m_showAds = true;
+		 m_MicrosoftAd = Microsoft.UnityPlugins.MicrosoftAdsBridge.InterstitialAdFactory.CreateAd();
+		 m_MicrosoftAd.AddCallback(Microsoft.UnityPlugins.AdCallback.Completed, OnMSAdCompleted);
+		 m_MicrosoftAd.AddCallback(Microsoft.UnityPlugins.AdCallback.Cancelled, OnMSAdCancelled);
+		 m_MicrosoftAd.AddCallback(Microsoft.UnityPlugins.AdCallback.Error, OnMSAdError);
+		 m_MicrosoftAd.Request(MicrosoftAdsAppId, NextMicrosoftAd, Microsoft.UnityPlugins.AdType.Video); 
+	}
+	````
+
+	Once ad is initialized, we can play the video on the same ShowAd method as before.
+
+	````C# 
+	if (m_MicrosoftAd != null)
+	{
+		 if (m_MicrosoftAd.State == Microsoft.UnityPlugins.InterstitialAdState.Ready)
+			  m_MicrosoftAd.Show();
+		 else
+			  m_MicrosoftAd.RequestAndShow(MicrosoftAdsAppId, NextMicrosoftAd);
+	}
+	````
+
+1. As you can see, with the above we have code to instantiate ads and play ads, yet we have not added a reference to the Microsoft Ads SDK. Unity is completely abstracted/isolated from this. We now need to add the implementation on the UWP project. In Visual Studio, in our Tanks project, add a reference to the Microsoft Universal Ads SDK.
+
+	![Add Ads SDK Reference in Visual Studio](./Images/VisualStudioAddAdsReference.png "Add Ads SDK Reference in Visual Studio")
+
+	_Add Ads SDK Reference in Visual Studio_
  
-2.  Next, we need to add the implementation of our IInterstitialAd interface. Right click on the Tanks project in Solution Explorer, Select **Add**->**Existing Item** and navigate to the ExtraFiles folder in this repo. 
+1. Next, we need to add the implementation of our IInterstitialAd interface. Right click on the Tanks project in Solution Explorer, Select **Add**->**Existing Item** and navigate to the ExtraFiles folder in this repo. 
 [If you are using a //build PC, that is under C:\labs\CodeLabs-GameDev-2-UnityWin10\Source\ExtraFiles] and select the **MSAdsBridge\MicrosoftAdsBridge.cs **file. 
 
-3. Finally, add the class factory so that the Unity code knows how to instantiate ads. This can be done anywhere, but for this kind of implementation, I always prefer to do it in the **App.xaml.cs**  **InitializeUnity**; that feels like a good place to ensure we don't run into a race condition later. 
+1. Finally, add the class factory so that the Unity code knows how to instantiate ads. This can be done anywhere, but for this kind of implementation, I always prefer to do it in the **App.xaml.cs**  **InitializeUnity**; that feels like a good place to ensure we don't run into a race condition later. 
 
-```C# 
-... 
-// right after appCallbacks.SetAppArguments(args); add our code.. 
- 
-Microsoft.UnityPlugins.MicrosoftAdsBridge.InterstitialAdFactory 
-    = new Microsoft.UnityPlugins.MicrosoftAdsFactory();
- 
-```
+	````C# 
+	... 
+	// right after appCallbacks.SetAppArguments(args); add our code.. 
+	 
+	Microsoft.UnityPlugins.MicrosoftAdsBridge.InterstitialAdFactory 
+		 = new Microsoft.UnityPlugins.MicrosoftAdsFactory();
+	````
+
 #### Let's see it!####
 To see Microsoft ads in action, just run the game and win two rounds. After the second round, the ad will show up.  
 
 #### Discussion around bridge technique ####
-> The bridge pattern can be handy to avoid lots of platform specific dependencies (if you have a winmd that depends on native libraries that will be different for ARM/x86/x64) it can be easier to do it on the UWP side than on Windows.  It is also easier to manage nuget references that auto-update themselves and can be restored automatically.  This example mostly should give you context on the many options you have to integrate Unity games w/ native WinRT functionality; referencing .NET assemblies, nuget packages, etc. It all works, since we are just using Visual Studio to manage app and nuget references.  
+
+The bridge pattern can be handy to avoid lots of platform specific dependencies (if you have a winmd that depends on native libraries that will be different for ARM/x86/x64) it can be easier to do it on the UWP side than on Windows.  It is also easier to manage nuget references that auto-update themselves and can be restored automatically.  This example mostly should give you context on the many options you have to integrate Unity games w/ native WinRT functionality; referencing .NET assemblies, nuget packages, etc. It all works, since we are just using Visual Studio to manage app and nuget references.  
 
 <a name="Summary" />
 ## Summary ##
