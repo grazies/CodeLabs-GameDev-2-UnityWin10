@@ -246,10 +246,14 @@ If you want to dive deeper into plugins within Unity, please see this [reference
 	_VungleSDKProxy Import Settings_
 
 1. Next, we can go into the **Plugins\Metro** folder and configure the **VungleSDKProxy.winmd**.
-	- This winmd needs to target **WSAPlayer** (the platform for Windows Store). 
+	- This winmd needs to target **WSAPlayer** (the platform for Windows Store).
+
 	- You can leave any SDK or since we are only targeting UWP, select **UWP** under SDK.
+
 	- The Scripting Backend should be **Dotnet**
+
 	- Check the "Don't process" checkbox.  Don't process is used to tell Unity that it should not patch the assembly. Unity needs to do extra processing to patch assemblies that have classes serializable in Unity (most often monobehaviours); for most managed plugins that just integrate with platforms and bring helper classes, the Don't process should be checked. To be 100% accurate, the setting is not required since we have a .winmd, and not a .dll, but i wanted to explain the setting, so leave it checked. 
+
 	- For placeholder, point it to the VungleSDKProxy in the **Plugins** folder. This tells Unity to use that placeholder assembly within editor, but not at run-time. We need placeholder assemblies because the Unity Editor is running Mono, so it can't load .NET 4.5 assemblies. Placeholders mimic the APIs on the assembly we want to use, but are compiled against .NET 3.5.   Here is our settings for our VungleSDKProxy in Plugins\Metro. 
 
 	![VungleSDKProxy.winmd Import Settings](./Images/VungleSDKProxyPluginsMetro.png "VungleSDKProxy.winmd Import Settings")
