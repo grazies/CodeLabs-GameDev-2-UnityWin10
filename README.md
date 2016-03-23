@@ -4,18 +4,19 @@
 
 <a name="Overview"></a> 
 ## Overview ##
-A great game should include both great game play and native platform integration that engages and aids the user to get the most out of the game. There are many different ways for you to integrate with the Universal Windows Platform from within your Unity games. This lab will give you an overview of the different approaches, and discuss some of the pros & cons of each.    
+A great game should include both great game play and native platform integration that engages and aids the user to get the most out of the game. There are many different ways to integrate with the Universal Windows Platform from within your Unity games. This lab will give you an overview of the different approaches, and discuss some of the pros & cons of each approach.    
  
 <a name="Objectives" ></a> 
 ### Objectives ###
 In this module, you will learn about these concepts: 
-- Understand the different #define pre-processors for writing native code on a Windows game.  
-- Integrate with Windows 10 by writing inline code to your Unity game 
-- Integrate with Windows 10 by writing and consuming Unity plugins 
+- Understand the different #define pre-processors for writing native code on a Windows game.
+- Understand how to dispatch calls between Unity's app thread and Windows' UI thread.   
+- Integrate with Windows 10 by writing inline code to your Unity game. 
+- Integrate with Windows 10 by consuming and configuring Unity plugins.  
  
-> NOTE:This lab is optimized to show you integration techniques. Most of the Unity code (game play, menus, event handlers) has been coded for you; you will need to inject the native code at right places, but the lab does not explain the 'glue' code we wrote in Unity. 
-You will be able to walk through that on your own (as you have all the source), at your own leisure. 
-You can find very detailed step by step and video tutorials for building the game on [Unity's learning site](https://unity3d.com/learn/tutorials/projects/tanks-tutorial).   
+> NOTE:This lab is optimized to show you integration techniques. Most of the Unity code (game play, menus, event handlers) has been coded; you will need to inject the native code at right places, but the lab does not explain the 'glue' code we wrote in Unity. 
+You will be able to walk through that on your own (as you have all the source). 
+If you want to learn how to write the game, you can find very detailed step by step and video tutorials for building the game at [Unity's learning site](https://unity3d.com/learn/tutorials/projects/tanks-tutorial).   
 
 <a name="Prerequisites"></a>
 ### Prerequisites ###
@@ -86,7 +87,6 @@ Let's use the Launcher APIs, to launch Help for our game, and to add a "rate us"
 
 1. In GameManager.cs, there is already an Input handler for F1 key in the Update loop, so we can add the code to launch our help screen in the browser.
 
-<!-- language: lang-cs --> 
 ```C# 
 void Update ()
 { 
@@ -115,7 +115,7 @@ public void OnRateClicked ()
 ```       
 
 3. For our final example of this technique, and to illustrate a little more immersive integration, let's add live tiles to our game.  At the end of each round, we can add a teaser message so users can come back if they quit game in middle of a round. Our game already has a **SetLiveTile** method that gets called at end of each round.  This method will update the text on our main live tile, and set an image (to make pop with more interactivity).   
-<!-- language: lang-cs -->
+<!-- language: lang-cs --> 
 ```C# 
 void SetLiveTile ( string textmessage )
 {                                                    
@@ -208,14 +208,15 @@ If you want to dive deeper into plugins within Unity, please see this [reference
 	    - There is a UWP folder. This is used for plugins for Universal (Windows 10) Projects. 
 	    - There is a WindowsPhone81 folder, since the plugin supports phone 8.1. We are not going to need that today, so <u>remove that Windows Phone 81 folder and it's contents</u>. 
 
-Let's now configure the rest of our SDK reference, pay close attention as there is a lot to learn here: 
-1. Go to the **Plugins** Folder and notice the VungleSDKProxy.dll. This DLL since is at the root of the plugins folder right now is applicable to all platforms.   Click on the dll and in the import settings, ensure the plugin's selected platform is Editor.  This will be used only when running in the Editor. 
+    Let's now configure the rest of our SDK reference, pay close attention as there is a lot to learn here: 
+
+1. Go to the **Plugins** Folder and notice the VungleSDKProxy.dll. This DLL since is at the root of the plugins folder right now is applicable to all platforms. Click on the dll to see it's import settings, ensure the plugin's selected platform is Editor.  This will be used only when running in the Editor. 
 
 ![](./Images/VungleSDKProxy.png)
 
 
 2. Next, we can go into the **Plugins\Metro** folder and configure the **VungleSDKProxy.winmd**
-    - This winmd needs to target WSAPlayer (the platform for Windows Store). 
+    - This winmd needs to target **WSAPlayer** (the platform for Windows Store). 
     - You can leave any SDK or since we are only targeting UWP, select **UWP** under SDK.
     - The Scripting Backend should be **Dotnet**
     - Check the "Don't process" checkbox.  Don't process is used to tell Unity that it should not patch the assembly. Unity needs to do extra processing to patch assemblies that have classes serializable in Unity (most often monobehaviours); for most managed plugins that just integrate with platforms and bring helper classes, the Don't process should be checked. To be 100% accurate, the setting is not required since we have a .winmd, and not a .dll, but i wanted to explain the setting, so leave it checked. 
@@ -230,17 +231,17 @@ Let's now configure the rest of our SDK reference, pay close attention as there 
 
 > Note: If you are wondering why VungleSDK does not have a placeholder, it does not need it. All possible calls to this assembly are 'brokered' through VungleSDKProxy, so we don't need a placeholder dll for this.  
 
-That is it, we have now configured all our plugin references. If you want more details around these imported settings, Unity's documentation has a [good overview of the import settings](http://docs.unity3d.com/Manual/windowsstore-plugins.html). 
+That is it, we have now configured all our plugin references. If you want more details around these plugin import settings, Unity's documentation has a [good overview of the import settings](http://docs.unity3d.com/Manual/windowsstore-plugins.html). 
 
 3. By adding the Vungle plugin to our Unity project we have changed what Unity needs to compile, so before we go further, we should **Build** within Unity like we did on our first task. By default, we would let Unity target the same folder we used earlier. What Unity would do here is update our C# projects (**Assembly-CSharp** and **Assembly-CSharp-firstpass**) and rebuild the game with all scripts and the new assets. It will however **not** update our UWP project, because once Unity outputs it once, it does not override the .csproj, the XAML and C# files, etc. Of course this is a problem, as we need for our project to have the new references (to VungleSDK.winmd)
 To get around this hiccup, we can do one of two options: 
     - Since we had not made any changes to the project exported by Unity, we can just build to a different folder, and have it create a new project we use. 
     - We can edit the unityoverwrite.txt file in our previously exported folder (Task1) and delete the line that has Tanks.csproj.  The line looks like the one below (though your hash will be different). Again you should delete it and save your unityoverwrite.txt file. 
-<!-- lang: lang-cs -->            
+          
 ```C#
 Tanks\Tanks.csproj: 49CB64084B043D447B36B13D5F2CF44D
 ```
-<!-- --> 
+
     - Now we can **Build** and Unity will overwrite the .csproj and include our new references. Of course, in the real-world if you had modified .csproj by adding more files or changing other settings you would have to merge it. The file is xml, so it is easy to compare and merge.
 
     - After Unity re-exports, confirm the new Tanks.csproj has a reference to VungleSDK and VungleSDKProxy; if that looks right, rebuild all just to ensure it is all working correctly.   
@@ -253,15 +254,13 @@ To save you a little typing time (and since the logic is simple and not critical
 1. Go to the top of the GameManager.cs file, and uncomment out the `#define USE_VUNGLE_ADS` line.
 2. Let's now review how Vungle is getting called:
     - In the **Start** function,  we initialize Vungle and subscribe to adCompleted event:
-<!-- --> 
-```C#
+    ```C#
 	Vungle.init("com.prime31.Vungle", "vungleTest", "vungleTest");
     Vungle.onAdFinishedEvent += OnAdFinished;  
-```
+    ```
     - Within OnAdFinished, we call OnAdCompleted ()
     - Within OnAdCompleted we will reset the volume (since game background music gets muted prior to playing the ads). This OnAdCompleted event is worth looking at because it demonstrates using  **UnityEngine.WSA.Application.InvokeOnAppThread()** to unmute the background music.
 
-<!-- --> 
 ```C#
 void OnAdCompleted()
 {
@@ -277,7 +276,7 @@ void OnAdCompleted()
         ToggleMute(false);
 }
 ```
-    - In GameManager's **RoundEnding** function we call the **ShowAd** method, which in Vungle's case first mutes the background music, then calls **Vungle.showAd** and sets the flag so the game loop knows to wait for ad to complete (**m_isDisplayingAd**). 
+- In GameManager's **RoundEnding** function we call the **ShowAd** method, which in Vungle's case first mutes the background music, then calls **Vungle.showAd** and sets the flag so the game loop knows to wait for ad to complete (**m_isDisplayingAd**). 
 
 With that, we are now ready to test ads in our game. 
 
@@ -291,9 +290,8 @@ To see Vungle ads, just run the game and win two rounds. After the second round,
 #### A bridge approach to integration ####
 In the previous example, we consumed a plugin from within Unity by importing the binary (VungleSDK.winmd) into Unity and linking to it. Sometimes, we don't want to do this due to dependencies/relationships between the host app (in this case our Tanks UWP project) and Unity, or maybe the binaries & dependencies would be too cumbersome (often this happens if you have an SDK that ships as a nuget package and has a lot of dependencies) or ships as a VSIX. For those situations, we use the standard software development [bridge pattern](https://en.wikipedia.org/wiki/Bridge_pattern) where we can put an abstraction (often an interface) on the Unity side and then leave the implementation to the target host project generated by Unity. Let's illustrate that by replacing our Vungle ads with Microsoft ads on our project.
 
-The code has already been typed for you, it is just hidden under `#if SHOW_MS_ADS` pre-processors, so to run this scenario, comment out the `#define SHOW_VUNGLE_ADS` at the top of game manager and uncomment out the MS_ADS
+The code has already been typed for you, it is just hidden under `#if SHOW_MS_ADS` pre-processors, so to run this scenario, comment out the `#define SHOW_VUNGLE_ADS` at the top of game manager and uncomment out the `#define SHOW_MS_ADS`
 
-<!-- language: lang-cs --> 
 ```C# 
 // #define SHOW_VUNGLE_ADS  
 #define SHOW_MS_ADS
@@ -301,7 +299,6 @@ The code has already been typed for you, it is just hidden under `#if SHOW_MS_AD
 Let's now review the implementation details on the Unity side.  
 
 1. We first need an abstraction to the APIs we want to call. In this case, there is an interface typed for us in CodeLab\MSAdsBridge\IMicrosoftAdsBridge.cs
-<!-- language: lang-cs --> 
 ```C# 
 public interface IInterstittialAd : IDisposable
 {
@@ -318,7 +315,6 @@ public interface IInterstittialAd : IDisposable
 }
 ``` 
 2. Next, we need a factory (or any other way to connect our abstraction to our concrete implementation). 
-<!-- language: lang-cs --> 
 ```C# 
 public class MicrosoftAdsBridge
 {
@@ -350,7 +346,6 @@ if (Microsoft.UnityPlugins.MicrosoftAdsBridge.InterstitialAdFactory != null)
 ```
 
 Once ad is initialized, we can play the video on the same ShowAd method as before:
-<!-- language: lang-cs --> 
 ```C# 
 if (m_MicrosoftAd != null)
 {
@@ -370,7 +365,6 @@ As you can see, with the above we have code to instantiate ads and play ads, yet
 
 3. Finally, add the class factory so that the Unity code knows how to instantiate ads. This can be done anywhere, but for this kind of implementation, I always prefer to do it in the **App.xaml.cs**  **InitializeUnity**; that feels like a good place to ensure we don't run into a race condition later. 
 
-<!-- language: lang-cs --> 
 ```C# 
 ... 
 // right after appCallbacks.SetAppArguments(args); add our code.. 
