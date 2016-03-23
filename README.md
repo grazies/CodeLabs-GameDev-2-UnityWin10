@@ -101,7 +101,7 @@ Estimated time to complete this module: **60 minutes**
 
 	- **Package.appxmanifest** is the manifest (configuration file) for our project. In this file, you will find what we configured under **Player Settings** and **Build Settings** in Unity.
 
-	- The **Assembly-Csharp** and **Assemby-CSharp** first pass projects is normally what Unity builds in the **Editor**. In this case, Unity generated them because we chose the option to create **Unity C# projects**. These will be handy for our mopdule as they allow us to rebuild the project (and game) from within Visual Studio without having to rebuild from Unity. Of course that works if all we modify is code (that goes into **Assembly-CSharp**); if we modify scenes, then we must rebuild from Unity. If you rebuild from Unity and output to same build folder, Unity will not override the code and settings for your games project (Tanks.csproj). Unity preserves these so that any changes you make to your solution are preserved.
+	- The **Assembly-Csharp** and **Assemby-CSharp** first pass projects is normally what Unity builds in the **Editor**. In this case, Unity generated them because we chose the option to create **Unity C# projects**. These will be handy for our module as they allow us to rebuild the project (and game) from within Visual Studio without having to rebuild from Unity. Of course that works if all we modify is code (that goes into **Assembly-CSharp**); if we modify scenes, then we must rebuild from Unity. If you rebuild from Unity and output to same build folder, Unity will not override the code and settings for your games project (Tanks.csproj). Unity preserves these so that any changes you make to your solution are preserved.
 
 <a name="Exercise2"></a>
 ### Exercise 2: Using Unity's native integration helper libraries ###
@@ -124,7 +124,7 @@ Let's use the Launcher APIs, to launch Help for our game, and to add a "rate us"
 	}
 	````
 
-1. This same technique can be used to implement the 'Rate us' functionality. There is already a "Rate us" button in the game. For demo purposes, it is coded to come up every 4th time you finish a round. So all we have to do is add code the **OnRateClicked** in the **SocialDialogManager** Behaviour:
+1. This same technique can be used to implement the 'Rate us' functionality. There is already a "Rate us" button in the game. For demo purposes, it is coded to come up every 4th time you finish a round. So all we have to do is add code the **OnRateClicked** in the **SocialDialogManager** Behavior.
 
 	````C#
 	public void OnRateClicked ()
