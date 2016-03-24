@@ -114,7 +114,7 @@ Of course, our game right now has no Windows integration; we will add that in ou
 
 For native integration, Unity includes a few wrappers for Windows Store features like tiles, toast notifications, and launchers.  These features are in the **UnityEngine.WSA** namespace.
 
-Let's use the Launcher APIs, to launch Help for our game, and to add a "rate us" feature to our game.
+Let's use the UnityEngine.WSA.Launcher APIs, to launch Help for our game, and to add a "rate us" feature to our game.
 
 1. In **GameManager.cs**, there is already an Input handler for F1 key in the Update loop, so we can add the code to launch our help screen in the browser.
 
@@ -123,7 +123,7 @@ Let's use the Launcher APIs, to launch Help for our game, and to add a "rate us"
 	{
 		if (Input.GetKeyUp(KeyCode.F1))
 		{
-			UnityEngine.WSA.Launcher.LaunchUri("ms-windows-store:REVIEW?PFN=Microsoft.Channel9_8wekyb3d8bbwe",
+			UnityEngine.WSA.Launcher.LaunchUri("https://github.com/Microsoft-Build-2016/CodeLabs-GameDev-2-UnityWin10/blob/master/Images/TanksHelp.jpg",
 				false);
 		}
 		...
@@ -141,7 +141,7 @@ Let's use the Launcher APIs, to launch Help for our game, and to add a "rate us"
 	}
 	````
 
-1. For our final example of this technique, and to illustrate a little more immersive integration, let's add live tiles to our game.  At the end of each round, we can add a teaser message so users can come back if they quit game in middle of a round. Our game already has a **SetLiveTile** method that gets called at end of each round.  This method will update the text on our main live tile, and set an image (to make pop with more interactivity).   
+1. For our final example of this technique, and to illustrate a little more immersive integration, let's add live tiles to our game.  At the end of each round, we can add a teaser message so users can come back if they quit game in middle of a round. Our game already has a **SetLiveTile** method that gets called at end of each round.  This method will update the text on our main live tile, and set an image to scroll with the tilea to make it pop with more interactivity.   
 
 	````C#
 	void SetLiveTile ( string textmessage )
@@ -156,28 +156,28 @@ We have added three features to our game. Let's now go see them in action!
 
 1. Viewing the Help file is easy. Any time during the game, press **F1**.
 1. To see the **social dialog** that prompt the user to rate the game, just play a few rounds. At the end of a round you will be prompted with a dialog to rate the app.
-1. The live tile feature also happens at end of a round; there is no UI to ask user if they want to update tile, etc. so play a round and if you want to see the code, set a break point in it.
-To see the live tile, you do need to have it pinned to your start menu. You can do it before, or after you have ran the game.  
+1. The live tile is getting updated at end of each round; there is no UI to ask user if they want to update tile, etc. so play a round and if you want to see the code, set a break point in **SetLiveTile**.
+To see the live tile, you do need to have it pinned to your Start menu. You can pin the tile  before, or after you have ran the game.  
 
 
 #### Discussion around Unity WSA APIs ####
 
-These APIs are convenient and easy to use. You did not notice this yet (we will cover it next), but there are threading requirements the API is abstracting and handling for you.
+These UnityEngine.WSA.* APIs are convenient and easy to use. You did not notice this yet (we will cover it next), but there are threading requirements the API is abstracting and handling for you, we will explore these in our next exercise. 
 
-Unfortunately, the APIs are also limited. They do not handle all native integration scenarios. No worries though, we can just inline code on Unity projects to access other the APIs.    
+Unfortunately, the APIs are also limited. They do not handle all native integration scenarios. No worries though, there are more options, let's explore our next one: writing inline code in your Unity project to access WinRT APIs.    
 
 
 <a name="Exercise3"></a>
 ### Exercise 3: Adding WinRT inline code to a Unity game ###
 
-When Unity games target Windows Store (with a .NET backend, not IL2CPP), they are compiled using the .NET compiler and therefore can access WinRT APIs, since as part of the build process, Unity links against WinRT libraries.  
+When Unity games target Windows Store (with a .NET backend, not IL2CPP), they are compiled using the .NET compiler and therefore can access WinRT APIs; as part of their build process, Unity links against WinRT libraries.  
 
-To inline WinRT code into your Unity project all you need to do is protect yourself so that Unity does not try to compile that when targeting other platforms; for this, we will use the NETFX_CORE pre-processor.
+To inline WinRT code into your Unity project all you need to do is protect yourself so that Unity does not try to compile that code when targeting other platforms; for this, we will use the NETFX_CORE pre-processor.
 
 Unity's documentation has more guidance on [pre-processors defines for platform specific compilation](http://docs.unity3d.com/Manual/PlatformDependentCompilation.html).  For today' exercises we will use these directives:
 
 - **NETFX_CORE** to filter for compiling with .NET Core (the C# compiler) and linking to WinRT.
-- **WINDOWS_UWP** to ensure code is used only on Windows 10, when APIs are 10 specific.
+- **WINDOWS_UWP** to ensure code is used only on Windows 10, when APIs are Windows 10 specific.
 - **UNITY_EDITOR** to filter out code that only runs in the editor.
 
 To exercise inlining code, we want to add support to enter and exit full screen mode when the user presses F11 in our game. The game is already listening for keyboard input in the **Update** loop in **GameManager**, so we can add the code to enter/exit full screen there:
@@ -186,7 +186,7 @@ To exercise inlining code, we want to add support to enter and exit full screen 
 else if (Input.GetKeyUp (KeyCode.F11))
 {
 #if NETFX_CORE && WINDOWS_UWP
-	 //Dispatch from App to UI Thread
+	 //Dispatch from Unity App thread to Windows UI Thread
 	 UnityEngine.WSA.Application.InvokeOnUIThread( ()=>
 	 {
 		  var appView = Windows.UI.ViewManagement.ApplicationView.GetForCurrentView();
@@ -206,13 +206,49 @@ Here are the relevant details to notice from our snippet:
 	- **Application.InvokeOnUIThread** used to dispatch a call from Unity's app thread to Windows' UI thread
 	- **Application.InvokeOnAppThread** used to dispatch calls from any thread to Unity's app thread.
 
-In our case, **ApplicationView.TryEnterFullScreenMode** requires that it be called from the UI thread, that is why we dispatched the call, but not all WinRT calls need to be dispatched.    
+In our case, **ApplicationView.TryEnterFullScreenMode** requires that it be called from the UI thread, that is why we dispatched the call, but not all WinRT calls need to be dispatched. For example, scheduled local toast notifications (which can be used to reengage users) can run from the Unity App thread and don't need dispatching.   Our game is already stubbed to schedule a toast notification, it has a **ScheduleReEngagement** method in GameManager, where we can add some notification code: 
+
+````C# 	
+void ScheduleReEngageToast()
+{
+    if (needsSessionToast)
+    {
+        string invite = "Your ammo is piling up. Let's battle!";
+        DateTime dueTime = DateTime.Now.AddSeconds(40);
+
+#if NETFX_CORE  
+        var notificationXmlDoc = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastText01);
+        var textNodeList = notificationXmlDoc.GetElementsByTagName("text");
+        if (textNodeList.Count > 0)
+        {
+            textNodeList[0].AppendChild(notificationXmlDoc.CreateTextNode(invite));
+            var toast = new ScheduledToastNotification(notificationXmlDoc, dueTime);
+            toast.Id = (++toastId).ToString();
+            ToastNotificationManager.CreateToastNotifier().AddToSchedule(toast);
+        }
+#endif 
+        needsSessionToast = false;
+    } 
+}
+````
+Notice that in this case, we only need a `NETFX_CORE` pre-processor, since these APIs work in Windows 8.x too. The full screen API we used earlier is Windows 10 only, that is why we had `NETFX_CORE` && `WINDOWS_UWP`.   That said, for the code above to compile you need to add the right using statements near the top of GameManager.cs  
+
+````C# 	
+#if NETFX_CORE
+using Windows.UI.Notifications;
+using Windows.Data.Xml.Dom;   
+#endif
+````
+
 
 
 #### Let's see it!####
 
 To see full screen running, just run the game and press **F11**. It should work.
-If you are curious, comment out the dispatcher call and call TryEnterFullScreenMode without dispatching and see what happens (ahem, crash).  
+If you are curious, comment out the dispatcher call and call TryEnterFullScreenMode without dispatching and see what happens (ahem, crash, ahem).   
+
+To see the toast notification,  just play a round and wait 40 seconds. You can even exit the game, the notification will fire even when game is not running. This way you could re-engage a user who has not played your game in a few days. 
+
 
 #### Discussion around inlining code ####
 
