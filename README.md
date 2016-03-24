@@ -157,7 +157,7 @@ We have added three features to our game. Let's now go see them in action!
 1. Viewing the Help file is easy. Any time during the game, press **F1**.
 1. To see the **social dialog** that prompt the user to rate the game, just play a few rounds. At the end of a round you will be prompted with a dialog to rate the app.
 1. The live tile is getting updated at end of each round; there is no UI to ask user if they want to update tile, etc. so play a round and if you want to see the code, set a break point in **SetLiveTile**.
-To see the live tile, you do need to have it pinned to your Start menu. You can pin the tile  before, or after you have ran the game.  
+To see the live tile, you do need to have it pinned to your Start menu. You can pin the tile before, or after you have run the game.  
 
 
 #### Discussion around Unity WSA APIs ####
