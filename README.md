@@ -4,7 +4,7 @@
 
 <a name="Overview"></a>
 ## Overview ##
-A great game should include both great game play and native platform integration that engages and aids the user to get the most out of the game. There are many different ways to integrate with the Universal Windows Platform from within your Unity games. This lab will give you an overview of the different approaches, and discuss some of the pros & cons of each approach.    
+A great game should include both great game play and native platform integration that engages and aids the user to get the most out of the game. This lab will give you an overview of different techniques you can use to integrate with the Universal Windows Platform from within your Unity game; we will discuss some of the pros & cons of each approach so you can reuse these techniques across any  integration scenario you may encounter.    
 
 <a name="Objectives" ></a>
 ### Objectives ###
@@ -16,21 +16,17 @@ In this module, you will learn about these concepts:
 - Integrate with Windows 10 by writing inline code to your Unity game.
 - Integrate with Windows 10 by consuming and configuring Unity plugins.
 
-> **Note:** This module is optimized to show you integration techniques. Most of the Unity code (game play, menus, event handlers) has been coded for you; you will need to inject the native code at right places, but the module does not explain the 'glue' code we wrote in Unity.
->
-> You will be able to walk through that on your own (as you have all the source).
->
-> If you want to learn how to write the game, you can find very detailed step by step and video tutorials for building the game at [Unity's learning site](https://unity3d.com/learn/tutorials/projects/tanks-tutorial).
+> **Note:** This module is optimized to show you integration techniques. Most of the Unity code (game play, menus, event handlers) has been coded for you; you will need to inject the native code at right places, but the module does not explain the 'glue' code we wrote in Unity. You will be able to walk through that on your own (as you have all the source). If you want to learn how to write the game, you can find very detailed  video tutorials for building the game at [Unity's learning site](https://unity3d.com/learn/tutorials/projects/tanks-tutorial).
 
 <a name="Prerequisites"></a>
 ### Prerequisites ###
 The following software is required to complete this module:
 
-- [Visual Studio Community 2015](https://www.visualstudio.com/products/visual-studio-community-vs) or greater
-- [Unity 5.3](http://unity3d.com/get-unity/update) or later
-- The 'starter' solution for this module pre-downloaded. You can get it from [Microsoft-Build-2016/CodeLabs-GameDev-2-UnityWin10](https://github.com/Microsoft-Build-2016/CodeLabs-GameDev-2-UnityWin10.git) github repository.
+- [Visual Studio Community 2015](https://www.visualstudio.com/products/visual-studio-community-vs) or greater. 
+- [Unity 5.3](http://unity3d.com/get-unity/update) or later.
+- The 'starter' solution for this module. You can get it from [Microsoft-Build-2016/CodeLabs-GameDev-2-UnityWin10](https://github.com/Microsoft-Build-2016/CodeLabs-GameDev-2-UnityWin10.git) github repository. The repo only shows Ex1 (as in Exercise 1) but that works for all exercises in this module. 
 
-The following software packages are used within the module. These can be optional, as you can choose to skip the exercises, but covering all exercises is recommended for a comprehensive coverage of different approaches to integrate with Windows, so we recommend you also install the following pre-requisites.
+The following software packages are used within the module. These can be optional, as you can choose to skip the exercises, but covering all exercises is recommended for the most comprehensive learning; to do all exercuses, you should install these extra  pre-requisites.
 
 - Vungle's Unity plugin. For _//build_ event, we have included this in the 'extra files' in the repo.  Post _//build_ event, you should get it from [Vungle's github repo](https://github.com/Vungle/Unity-Plugin)
 - [Microsoft Universal Ads SDK](https://visualstudiogallery.msdn.microsoft.com/401703a0-263e-4949-8f0f-738305d6ef4b )
@@ -51,57 +47,67 @@ Estimated time to complete this module: **60 minutes**
 <a name="Exercise1"></a>
 ### Exercise 1: Exporting Unity Project to Windows Store with C# Projects ###
 
-1. Open the **Ex1/Begin** Tanks project in Unity.
+1. Open the **Ex1/Begin** project in Unity.
 
 	> **Note:** If using default setup at the event, the folder is at
 **C:\labs\CodeLabs-GameDev-2-UnityWin10\Source\Ex1\Begin**.
 
 
-1. From Unity, let's prepare our project so we can build a player targeting UWP. You can do this via **File-> Build Settings** menu.  Don't click **Build** yet, we need to configure a few options.
+1. In Unity, let's prepare our project so we can build a player targeting UWP. You can do this via **File-> Build Settings** menu.  Don't click **Build** yet, we need to configure a few options.
 
 1. In the **Build Settings** dialog box, select **Universal 10** as target SDK.
 
-1. Select **XAML** as the **UWP Build Type**. XAML is default for most scenarios as it allows you to bring XAML UI into your game. In this case, we need XAML UI for showing ads in a later task.   
+1. Select **XAML** as the **UWP Build Type**. XAML is used for most games  as it allows you to bring XAML UI (like Web Views, and dialogs) into your game. In this case, we need XAML UI for showing ads in a later task.   
 
-1. For this module, make sure you select the option to Export **Unity C# projects**; we will explain what this does a few steps down when we walk through the output.
+1. For this exercise, make sure you select the option to Export **Unity C# projects**; we will explain what this option does when we walk through the output from the build step.
 
 	![Build Action](./Images/BuildAction.png "Build Action")
 
 	_Build Action_
 
-1. Before we click **Build** we should also set our **Player Settings**. Click the **Player Settings** button.
+1. Before we click **Build** we should also set our Player Settings. Click the **Player Settings** button.
 
-1. In player settings you can configure the name of your app, the default splash screen and icons, orientation, rendering options, sensors, and many other options. Explore all of these and feel free to change these.
+1. In player settings you can configure the name of your app, the splash screen, icons and tiles, orientation, rendering options, sensors, capabilities, and many other options. Explore all of these and feel free to change them.
 
 	![Player Settings](./Images/PlayerSettings.png "Player Settings")
 
 	_Player Settings_
 
-1. The setting that we are after in our case is under **capabilities** in the **Publishing Settings** section. We need to add the **InternetClient** capability to our project so that later when we show ads these can be downloaded from the internet.
+1. The setting that we are after in our case is under **capabilities** in the **Publishing Settings** section. [Capabilities](https://msdn.microsoft.com/en-us/library/windows/apps/br211422.aspx) is a UWP concept, it declares an intent to use a protected resource.  For our project, we need to add the **InternetClient** capability so that later when we show ads these can be downloaded from the internet.
 
 	![Player Settings Capabilities](./Images/PlayerSettingsCapabilities.png "Player Settings Capabilities")
 
 	_Player Settings Capabilities_
 
-1. Now, we can click **Build**. You will be prompted to select a folder you are building to. Give it any project name. If you want to mimic our solution (not required) you can call it _Task1Solution_.
+1. When done configuring player settings,  click **Build**. You will be prompted to select a folder you are building to. Give it any project name. If you want to mimic our solution (not required) you can call it _Win10Solution_.
 
-1. The Unity build process will take a few minutes, once it is done, Unity will launch a **Windows Explorer** window to your build folder. Locate the **Tanks.sln** in that folder and open it in Visual Studio.
+1. The build process will take a few minutes, when it is completed, Unity will launch a **Windows Explorer** window to your build folder. Locate the **Tanks.sln** in that folder and open it in Visual Studio.
 
-1. Let's now explore what Unity created.
+1. Let's now explore the solution and projects that Unity created.
 
-	![Visual Studio Solution Explorer](./Images/VisualStudioSolutionExplorer.png "Visual Studio Solution Explorer")
+	![Visual Studio Solution Explorer](./Images/VisualStudioSolutionExplorer.png "Exported Projects")
 
-	_Visual Studio Solution Explorer_
+	_Exported Projects_
 
-	- **Tanks (Universal Windows)** is our game; the one we will submit to the store.
+	- **Tanks (Universal Windows)** is our game; this is the project we will submit to the Windows Store.
 
-	- **Tanks (Universal Windows)** reference **Assembly-CSharp.dll**, which is the game generated by Unity. This assembly has all our MonoBehaviours and logic.
+	- **Tanks (Universal Windows)** references **Assembly-CSharp.dll**, which is the game generated by Unity. This assembly has all our MonoBehaviours and game logic.
 
-	- The data folder in Tanks project is where Unity put the projects, assets, levels, etc. for the game.
+	- The data folder in Tanks project is where Unity put the projects' resources, assets, levels, etc. 
 
-	- **Package.appxmanifest** is the manifest (configuration file) for our project. In this file, you will find what we configured under **Player Settings** and **Build Settings** in Unity.
+	- **Package.appxmanifest** is the manifest (configuration file) for our project. In this file, you will find what we configured under **Player Settings** and **Build Settings** in the Unity Editor. There are more settings here, so do explore it. 
 
-	- The **Assembly-Csharp** and **Assemby-CSharp** first pass projects is normally what Unity builds in the **Editor**. In this case, Unity generated them because we chose the option to create **Unity C# projects**. These will be handy for our module as they allow us to rebuild the project (and game) from within Visual Studio without having to rebuild from Unity. Of course that works if all we modify is code (that goes into **Assembly-CSharp**); if we modify scenes, then we must rebuild from Unity. If you rebuild from Unity and output to same build folder, Unity will not override the code and settings for your games project (Tanks.csproj). Unity preserves these so that any changes you make to your solution are preserved.
+	- The **Assembly-Csharp** and **Assemby-CSharp** first pass projects are  what Unity usually builds in the **Editor**. In this case, Unity generated them because we chose the option to create **Unity C# projects**. These will be handy for today as they allow us to recompile Assembly-CSharp (our game logic) from within Visual Studio without having to rebuild from Unity. Of course that works if all we modify is the code; if we modify scenes or add resources or change player or build settings, then we must rebuild from Unity. If you rebuild from Unity to the same build folder, Unity will not override the code and settings for Tanks (Universal Windows) project. Unity preserves these so that any changes you make to the project are not overwritten.
+
+#### Let's see it!####
+Our game is already functional.
+
+1. To run it, change the target platform in Visual Studio from **ARM** to **x86**.
+
+1. Press **F5** or click on the **Local Machine** button in Visual Studio to start the game. 
+
+Of course, our game right now has no Windows integration; we will add that in our next steps. 
+ 
 
 <a name="Exercise2"></a>
 ### Exercise 2: Using Unity's native integration helper libraries ###
