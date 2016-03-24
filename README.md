@@ -23,7 +23,7 @@ In this module, you will learn about these concepts:
 The following software is required to complete this module:
 
 - [Visual Studio Community 2015](https://www.visualstudio.com/products/visual-studio-community-vs) or greater. 
-- [Unity 5.3](http://unity3d.com/get-unity/update) or later.
+- [Unity 5.3.3f1](http://unity3d.com/get-unity/update) or later.
 - The 'starter' solution for this module. You can get it from [Microsoft-Build-2016/CodeLabs-GameDev-2-UnityWin10](https://github.com/Microsoft-Build-2016/CodeLabs-GameDev-2-UnityWin10.git) github repository. The repo only shows Ex1 (as in Exercise 1) but that works for all exercises in this module. 
 
 The following software packages are used within the module. These can be optional, as you can choose to skip the exercises, but covering all exercises is recommended for the most comprehensive learning; to do all exercuses, you should install these extra  pre-requisites.
@@ -244,10 +244,10 @@ using Windows.Data.Xml.Dom;
 
 #### Let's see it!####
 
-To see full screen running, just run the game and press **F11**. It should work.
+To toggle in and out of full screen mode, just run the game and press **F11**. 
 If you are curious, comment out the dispatcher call and call TryEnterFullScreenMode without dispatching and see what happens (ahem, crash, ahem).   
 
-To see the toast notification,  just play a round and wait 40 seconds. You can even exit the game, the notification will fire even when game is not running. This way you could re-engage a user who has not played your game in a few days. 
+To see the toast notification,  just win a battle in the game and wait 40 seconds. You can even exit the game, the notification will fire even when game is not running. This way you could re-engage a user who has not played your game in a few days. 
 
 
 #### Discussion around inlining code ####
@@ -257,13 +257,13 @@ You have now seen how easy it is to inline WinRT code. Just understand and pay a
 <a name="Exercise4"></a>
 ### Exercise 4: Configuring a reference to a Unity plugin ###
 
-This section discusses referencing a managed Unity plugin; it focuses on the Windows' specific options to configure it and reference it. For practical purposes here, let's summarize a plugin as a .NET assembly or Winrt component (winmd) that we need to reference from within our Unity code.
+This section discusses referencing a managed Unity plugin; it focuses on the Windows' specific options to configure it and reference it. For practical purposes here, let's summarize a plugin as a .NET assembly or WinRT component (winmd) that we need to reference from within our Unity code.
 
-If you want to dive deeper into plugins within Unity, please see this [reference](http://docs.unity3d.com/Manual/Plugins.html) in Unity's documentation.
+If you want to dive deeper into plugins, please see this [reference](http://docs.unity3d.com/Manual/Plugins.html) in Unity's documentation.
 
 1. Go back into **Unity Editor**.
 
-1. Add a reference to Vungle's Unity Package, which includes a plugin. To do this, select **Assets -> Import New Package -> Custom Package**.
+1. Add a reference to Vungle's Unity Package, which includes a managed plugin. To do this, select **Assets -> Import  Package -> Custom Package**.
 
 	![Import Custom Package in Unity Editor ](./Images/UnityEditorImportCustomPackage.png "Import Custom Package in Unity Editor")
 
@@ -271,17 +271,17 @@ If you want to dive deeper into plugins within Unity, please see this [reference
 
 1. Navigate to the folder where your **VungleSDK.UnityPackage** is located. If you are using the one pulled with this repo, it is in the **Source/ExtraFiles/Vungle** folder.
 
-1. Click **Open** to add it to our Unity project.
+1. Click **Open** to add the package to our Unity project.
 
-1. After selecting the package, you will see the **Unity Import Dialog**.  In Vungle's case, they ship one plugin for all platforms (iOS, Android, Windows). This is fine for us. Click **Import** to import all the files. Let's now review the important ones (for Windows Store and Windows Phone) configurations.
+1. After selecting the package, you will see the **Unity Import Dialog**.  In Vungle's case, they ship code for all platforms (iOS, Android, Windows). This is fine for us. Click **Import** to import all the files. Let's now review the important ones (for Windows Store and Windows Phone) configurations; the files are in the Plugins folder. 
 
 	 - Notice the files are under a **Plugins/Metro** folder structure. Unity follows a specific folder hierarchy and naming convention, with a folder name for each different target platform. Starting with Unity 5, the folder hierarchy is not required, as Unity allows you to configure it manually via the new Plugin inspector, but for ease of use, it is still handy to follow. You can find out more about these folder names in Unity's [Plugin Inspector documentation](http://docs.unity3d.com/Manual/PluginInspector.html).
 
 	 - There is a **UWP** folder. This is used for plugins for Universal (Windows 10) Projects.
 
-	 - There is a **WindowsPhone81** folder, since the plugin supports phone 8.1. We are not going to need that today, so <u>remove that Windows Phone 81 folder and its contents</u>.
+	 - There is a **WindowsPhone81** folder, since Vungle supports Windows Phone 8.1 too. We are not going to need that today, so <u>delete that Windows Phone 81 folder and its contents</u>.
 
-1. Let's now configure the rest of our SDK reference, pay close attention as there is a lot to learn here. Go to the **Plugins** Folder and notice the **VungleSDKProxy.dll.** This DLL since is at the root of the plugins folder right now is applicable to all platforms. Click the dll to see it's import settings, ensure the plugin's selected platform is Editor. This will be used only when running in the Editor.
+1. Let's now configure the rest of our SDK references, pay close attention as there is a lot details here. Go to the **Plugins** Folder and notice the **VungleSDKProxy.dll.** This DLL since is at the root of the plugins folder right now is applicable to all platforms. Click the dll to see it's import settings, ensure the plugin's selected platform is Editor. This will be used only when running in the Editor. Click **Apply** after you make your changes. 
 
 	![VungleSDKProxy Import Settings](./Images/VungleSDKProxy.png "VungleSDKProxy Import Settings")
 
@@ -290,19 +290,22 @@ If you want to dive deeper into plugins within Unity, please see this [reference
 1. Next, we can go into the **Plugins\Metro** folder and configure the **VungleSDKProxy.winmd**.
 	- This winmd needs to target **WSAPlayer** (the platform for Windows Store).
 
-	- You can leave any SDK or since we are only targeting UWP, select **UWP** under SDK.
+	- Since we are only targeting UWP, select **UWP** under _SDK_.
 
-	- The Scripting Backend should be **Dotnet**
+	- The _Scripting Backend_ should be **Dotnet**
 
-	- Check the "Don't process" checkbox.  Don't process is used to tell Unity that it should not patch the assembly. Unity needs to do extra processing to patch assemblies that have classes serializable in Unity (most often monobehaviours); for most managed plugins that just integrate with platforms and bring helper classes, the Don't process should be checked. To be 100% accurate, the setting is not required since we have a .winmd, and not a .dll, but i wanted to explain the setting, so leave it checked.
+	- Check the **Don't process** checkbox.  Don't process is used to tell Unity that it should not patch the assembly. Unity needs to do extra processing to patch assemblies that have classes that need to be serialized in Unity; for most managed plugins that just add native integration, the Don't process should be checked as these assemblies rarely contain Unity serializable objects. To be 100% accurate, the setting is not required since we have a .winmd, and not a .dll, but i wanted to explain the setting, so leave it checked.
 
-	- For placeholder, point it to the VungleSDKProxy in the **Plugins** folder. This tells Unity to use that placeholder assembly within editor, but not at run-time. We need placeholder assemblies because the Unity Editor is running Mono, so it can't load .NET 4.5 assemblies. Placeholders mimic the APIs on the assembly we want to use, but are compiled against .NET 3.5.   Here is our settings for our VungleSDKProxy in Plugins\Metro.
+	- For placeholder, point it to the VungleSDKProxy in the **Plugins** folder. This tells Unity to use that placeholder assembly within the Unity editor. We need placeholder assemblies because the Unity Editor is running Mono, it can't load .NET 4.5 assemblies (or WinMDs). Placeholders mimic the API signatures of the assembly we want to use, but placeholders are compiled against .NET 3.5. that way every thing compiles within editor (using placeholder), and when building to target UWP (using real plugin). 
+	- Here is our complete settings for our VungleSDKProxy in Plugins\Metro, so you can verify you made all the changes. Again, click *Apply* when you are done. 
 
 	![VungleSDKProxy.winmd Import Settings](./Images/VungleSDKProxyPluginsMetro.png "VungleSDKProxy.winmd Import Settings")
 
 	_VungleSDKProxy.winmd Import Settings_
 
-1. Next, we can configure **VungleSDK.winmd** in **Plugins\Metro\UWP** using these settings.
+1. Next, delete the **VungleSDK.winmd** file in the **Plugins\Metro** folder. We won't use this as we are going to configure the one under UWP folder.  The Vungle package includes this extra file to workaround an issue in earlier versions of Unity. Do pay attention to the folder and make sure you only delete the one in Plugins\Metro, not the one in Plugins\Metro\UWP. 
+
+2. Next, we can configure **VungleSDK.winmd** in **Plugins\Metro\UWP** using these settings. 
 
 	![VungleSDK for UWP Import Settings](./Images/VungleSDKPluginsMetroUWP.png "VungleSDK for UWP Import Settings")
 
@@ -310,34 +313,34 @@ If you want to dive deeper into plugins within Unity, please see this [reference
 
 	> **Note 1:** If you are wondering why VungleSDK does not have a placeholder, it does not need it. All possible calls to this assembly are 'brokered' through VungleSDKProxy, so we don't need a placeholder dll for this.  
 
-	> **Note 2:** That is it, we have now configured all our plugin references. If you want more details around these plugin import settings, Unity's documentation has a [good overview of the import settings](http://docs.unity3d.com/Manual/windowsstore-plugins.html).
+	> **Note 2:** That is it, we have now configured all our plugin references. If you want more details around these plugin import settings, Unity's documentation has a good overview of the [import settings](http://docs.unity3d.com/Manual/windowsstore-plugins.html).
 
-1. By adding the Vungle plugin to our Unity project we have changed what Unity needs to compile, so before we go further, we should **Build** within Unity like we did on our first task. By default, we would let Unity target the same folder we used earlier. What Unity would do here is update our C# projects (**Assembly-CSharp** and **Assembly-CSharp-firstpass**) and rebuild the game with all scripts and the new assets. It will however **not** update our UWP project, because once Unity outputs it once, it does not override the .csproj, the XAML and C# files, etc. Of course this is a problem, as we need for our project to have the new references (_to VungleSDK.winmd_). To get around this hiccup, we can do one of two options:
+1. By adding the Vungle plugin to our Unity project we have changed what Unity needs to compile, so before we go further, we should **Build** within Unity like we did on our first task. Most of the time, when rebuilding, we  let Unity target the same folder we used earlier. What Unity would do here is update our C# projects (**Assembly-CSharp** and **Assembly-CSharp-firstpass**) and rebuild the game with all scripts and the new assets. It will however **not** update our UWP project, because once Unity outputs it once, it does not override the .csproj, the XAML and C# files, etc. Of course this is a problem, as we need for our project to have the new references (_to VungleSDK.winmd_). To get around this hiccup, we can do one of two options:
 
-	- Since we had not made any changes to the project exported by Unity, we can just build to a different folder, and have it create a new project we use.
+	- Since we had not made any changes to the project exported by Unity, we can just build to a different folder, and have it create a new project for us to use.
 
-	- We can edit the _unityoverwrite.txt_ file in our previously exported folder (Task1) and delete the line that has Tanks.csproj. The line looks like the one below (though your hash will be different). Again you should delete it and save your _unityoverwrite.txt_ file.
+	- We can edit the _unityoverwrite.txt_ file in our previously exported folder (Win10Solution if you used default name) and delete the line that has Tanks.csproj. The line looks like the one below (though your hash will be different). Again you should delete it and save your _unityoverwrite.txt_ file.  By us deleting this line, Unity will know to override it next time we Build. 
 
 		````
 		Tanks\Tanks.csproj: 49CB64084B043D447B36B13D5F2CF44D
 		````
 
-1. Now we can **Build** and Unity will overwrite the .csproj and include our new references. Of course, in the real-world if you had modified .csproj by adding more files or changing other settings you would have to merge it. The file is xml, so it is easy to compare and merge.
+1. Now we can **Build** and Unity will overwrite the .csproj and include our new references. Of course, in the real-world if you had modified Tanks.csproj by adding more files or changing other settings you would have to merge it. The file is xml, so it is easy to compare and merge.
 
-1. After Unity re-exports, confirm the new _Tanks.csproj_ has a reference to **VungleSDK** and **VungleSDKProxy**; if that looks right, rebuild all just to ensure it is all working correctly.
+1. After Unity builds, confirm the new _Tanks.csproj_ has a reference to **VungleSDK** and **VungleSDKProxy**; if that looks right, rebuild all just to ensure it is all working correctly.
 
 1. Now that we have our references configured within Unity and have recompiled, we can call the code to show the ads. Let's go back to Visual Studio.
 
-1. To save you a little typing time (and since the logic is simple and not critical to Windows integration, the code is written, but excluded via a `#if USE_VUNGLE_ADS` pre-processors. Go to the top of the **GameManager.cs** file, and uncomment out the `#define USE_VUNGLE_ADS` line.
+1. To save you a little typing time (and since the logic is simple and not critical to Windows integration, the code is written, but excluded via a `#if USE_VUNGLE_ADS` pre-processor. Go to the top of the **GameManager.cs** file, and uncomment out the `#define USE_VUNGLE_ADS` line and let's now review how Vungle is getting called. 
 
-1. Let's now review how Vungle is getting called. In the **Start** function,  we initialize Vungle and subscribe to adCompleted event.
+1. In the **Start** function,  we initialize Vungle and subscribe to adCompleted event.
 
 	````C#
 	Vungle.init("com.prime31.Vungle", "vungleTest", "vungleTest");
 	Vungle.onAdFinishedEvent += OnAdFinished;  
 	````
 
-1. Then, within **OnAdFinished**, we call **OnAdCompleted()**.
+1. Then, within **OnAdFinished** event handler, we call **OnAdCompleted()**.
 
 1. Within **OnAdCompleted** we will reset the volume (since game background music gets muted prior to playing the ads). This **OnAdCompleted** event is worth looking at because it demonstrates using **UnityEngine.WSA.Application.InvokeOnAppThread()** to unmute the background music.
 
@@ -357,7 +360,7 @@ If you want to dive deeper into plugins within Unity, please see this [reference
 	}
 	````
 
-1. In GameManager's **RoundEnding** function we call the **ShowAd** method, which in Vungle's case first mutes the background music, then calls **Vungle.showAd** and sets the flag so the game loop knows to wait for ad to complete (**m_isDisplayingAd**).
+1. In GameManager's **RoundEnding** function we call the **ShowAd** method, which first mutes the background music, then calls **Vungle.showAd** and sets a flag so the game loop knows to wait for ad to complete (**m_isDisplayingAd**).
 
 With that, we are now ready to test ads in our game.
 
@@ -366,7 +369,7 @@ To see Vungle ads, just run the game and win two rounds. After the second round,
 
 #### Discussion around plugin configuration ####
 
-You have now seen how easy it is to integrate a managed Unity plugin or a WinRT component into your Unity project. Plugins are a critical part of code/logic reuse and a great integration and extensibility point for games, as most games leverage shared analytics, ads, social networks, etc. All of these are powered by reusable plugins you will consume from Unity.
+You have now seen how easy it is to integrate a managed Unity plugin or a WinRT component into your Unity project. Plugins are a critical part of code  reuse and a frequent source of integration and extensibility  for games, as most games leverage shared analytics, ads, social networks, etc. All of these are powered by reusable plugins you will consume from Unity.
 
 <a name="Exercise5"></a>
 ### Exercise 5: Taking a bridge approach to integration ####
