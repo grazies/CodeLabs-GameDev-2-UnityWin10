@@ -180,7 +180,7 @@ Unity's documentation has more guidance on [pre-processors defines for platform 
 - **WINDOWS_UWP** to ensure code is used only on Windows 10, when APIs are Windows 10 specific.
 - **UNITY_EDITOR** to filter out code that only runs in the editor.
 
-To exercise inlining code, we want to add support to enter and exit full screen mode when the user presses F11 in our game. The game is already listening for keyboard input in the **Update** loop in **GameManager**, so we can add the code to enter/exit full screen there:
+To exercise inlining code, we want to add support to enter and exit full screen mode when the user presses F11 in our game. The game is already listening for keyboard input in the **Update** loop in **GameManager.cs**, so we can add the code to enter/exit full screen there:
 
 ````C# 	
 else if (Input.GetKeyUp (KeyCode.F11))
