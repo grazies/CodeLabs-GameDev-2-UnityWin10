@@ -6,7 +6,8 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using System.Xml; 
+using System.Xml;
+using System;
 
 namespace Complete
 {
@@ -302,9 +303,10 @@ void OnAdCompleted()
             // Get a message based on the scores and whether or not there is a game winner and display it.
             string message = EndMessage ();
             m_MessageText.text = message;
-            bool isEndOfGame = m_GameWinner != null; 
+            bool isEndOfGame = m_GameWinner != null;
 #if WINDOWS_UWP
             SetLiveTile( GetTileMessage(isEndOfGame) );
+            ScheduleReEngageToast (); 
 #endif
             // Wait for the specified length of time until yielding control back to the game loop.
             yield return m_EndWait;
@@ -464,6 +466,21 @@ void OnAdCompleted()
         {                          
                          
         }
+
+        int toastId = 0;
+        bool needsSessionToast = true;
+        void ScheduleReEngageToast()
+        {
+            if (needsSessionToast)
+            {
+                string invite = "Your ammo is piling up. Let's battle!";
+                DateTime dueTime = DateTime.Now.AddSeconds(40);
+                //Add scheduled notification code here.. 
+
+
+            }
+        }
+
         void OnApplicationPause(bool paused)
         {             
             if (paused)

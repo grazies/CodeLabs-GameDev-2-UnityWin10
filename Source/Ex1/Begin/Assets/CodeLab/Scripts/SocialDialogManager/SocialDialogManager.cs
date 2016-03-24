@@ -15,8 +15,7 @@ public class SocialDialogManager : MonoBehaviour {
 
     public void OnRateClicked ()
     {
-        // TODO: Add Code to link to store rating 
-        UnityEngine.WSA.Launcher.LaunchUri("ms-windows-store:REVIEW?PFN=Microsoft.Channel9_8wekyb3d8bbwe", false); 
+                 
         DismissDialog(); 
     }
 

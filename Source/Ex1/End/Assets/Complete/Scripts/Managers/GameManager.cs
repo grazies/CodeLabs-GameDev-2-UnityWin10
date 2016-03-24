@@ -1,12 +1,18 @@
 // #define SHOW_VUNGLE_ADS  
 // #define SHOW_MS_ADS  
-// #define EASYPLAY 
+ #define EASYPLAY 
 
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using System.Xml; 
+using System.Xml;
+using System;
+
+#if NETFX_CORE && WINDOWS_UWP 
+using Windows.UI.Notifications;
+using Windows.Data.Xml.Dom;   
+#endif
 
 namespace Complete
 {
@@ -305,6 +311,7 @@ namespace Complete
             bool isEndOfGame = m_GameWinner != null; 
 #if WINDOWS_UWP
             SetLiveTile( GetTileMessage(isEndOfGame) );
+            ScheduleReEngageToast(); 
 #endif
             // Wait for the specified length of time until yielding control back to the game loop.
             yield return m_EndWait;
@@ -475,11 +482,40 @@ namespace Complete
             }
         }
 
-        void SetLiveTile ( string s )
-        {                          
-            UnityEngine.WSA.Tile.main.Update( "ms-appx:///Data/StreamingAssets/TanksIcon_150x150.png" ,
-                "ms-appx:///Data/StreamingAssets/TanksIcon_310x150.png", string.Empty, s);             
+        int toastId = 0;
+        bool needsSessionToast = true;  
+        void ScheduleReEngageToast()
+        {
+            if (needsSessionToast)
+            {
+                string invite = "Your ammo is piling up. Let's battle!";
+                DateTime dueTime = DateTime.Now.AddSeconds(40);
+
+                var notificationXmlDoc = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastText01);
+                var textNodeList = notificationXmlDoc.GetElementsByTagName("text");
+                if (textNodeList.Count > 0)
+                {
+                    textNodeList[0].AppendChild(notificationXmlDoc.CreateTextNode(invite));
+                    var toast = new ScheduledToastNotification(notificationXmlDoc, dueTime);
+                    toast.Id = (++toastId).ToString();
+                    ToastNotificationManager.CreateToastNotifier().AddToSchedule(toast);
+                }
+                needsSessionToast = false;
+            } 
         }
+
+         
+        void SetLiveTile ( string s )
+        {
+            UnityEngine.WSA.Tile.main.Update("ms-appx:///Data/StreamingAssets/TanksIcon_150x150.png",
+                "ms-appx:///Data/StreamingAssets/TanksIcon_310x150.png", string.Empty, s);             
+             
+        }
+
+        
+        
+          
+
         void OnApplicationPause(bool paused)
         {             
             if (paused)
