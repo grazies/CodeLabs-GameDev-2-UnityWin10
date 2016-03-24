@@ -206,7 +206,7 @@ Here are the relevant details to notice from our snippet:
 	- **Application.InvokeOnUIThread** used to dispatch a call from Unity's app thread to Windows' UI thread
 	- **Application.InvokeOnAppThread** used to dispatch calls from any thread to Unity's app thread.
 
-In our case, **ApplicationView.TryEnterFullScreenMode** requires that it be called from the UI thread, that is why we dispatched the call, but not all WinRT calls need to be dispatched. For example, scheduled local toast notifications (which can be used to reengage users) can run from the Unity App thread and don't need dispatching.   Our game is already stubbed to schedule a toast notification, it has a **ScheduleReEngagement** method in GameManager, where we can add some notification code: 
+In our case, **ApplicationView.TryEnterFullScreenMode** requires that it be called from the UI thread, that is why we dispatched the call, but not all WinRT calls need to be dispatched. For example, scheduled local toast notifications (which can be used to reengage users) can run from the Unity App thread and don't need dispatching.   Our game is already stubbed to schedule a toast notification, it has a **ScheduleReEngagement** method in GameManager.cs, where we can add some notification code: 
 
 ````C# 	
 void ScheduleReEngageToast()
