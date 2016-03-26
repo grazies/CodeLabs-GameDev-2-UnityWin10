@@ -99,6 +99,10 @@ Estimated time to complete this module: **60 minutes**
 
 	- The **Assembly-Csharp** and **Assemby-CSharp** first pass projects are  what Unity usually builds in the **Editor**. In this case, Unity generated them because we chose the option to create **Unity C# projects**. These will be handy for today as they allow us to recompile Assembly-CSharp (our game logic) from within Visual Studio without having to rebuild from Unity. Of course that works if all we modify is the code; if we modify scenes or add resources or change player or build settings, then we must rebuild from Unity. If you rebuild from Unity to the same build folder, Unity will not override the code and settings for Tanks (Universal Windows) project. Unity preserves these so that any changes you make to the project are not overwritten.
 
+> **Note**: Since AssemblyCSharp has our game, that is where all files we edit today will be. There are two folders to look after: 
+- _Complete_ is the folder that has the original game. It is called Complete as that is the folder at end of Unity's tutorial. Our _GameManager_ is there; we did tweak this file beyond Unity's tutorial. 
+- _CodeLab_ has a few scripts we added for the codelab. Our _SocialDialogManager_ and the Microsoft Ads scripts are there. 
+
 #### Let's see it!####
 Our game is already functional.
 
@@ -116,7 +120,7 @@ For native integration, Unity includes a few wrappers for Windows Store features
 
 Let's use the UnityEngine.WSA.Launcher APIs, to launch Help for our game, and to add a "rate us" feature to our game.
 
-1. In **GameManager.cs**, there is already an Input handler for F1 key in the Update loop, so we can add the code to launch our help screen in the browser.
+1. In **GameManager.cs** (located in Complete\Scripts\Managers folder), there is already an Input handler for F1 key in the Update loop, so we can add the code to launch our help screen in the browser.
 
 	````C#
 	void Update ()
@@ -130,7 +134,7 @@ Let's use the UnityEngine.WSA.Launcher APIs, to launch Help for our game, and to
 	}
 	````
 
-1. This same technique can be used to implement the 'Rate us' functionality. There is already a "Rate us" button in the game. For demo purposes, it is coded to come up every 4th time you finish a round. So all we have to do is add code the **OnRateClicked** in the **SocialDialogManager** Behavior.
+1. This same technique can be used to implement the 'Rate us' functionality. There is already a "Rate us" button in the game. For demo purposes, it is coded to come up every 4th time you finish a round. So all we have to do is add code the **OnRateClicked** in the **SocialDialogManager** Behaviour (this file is located in CodeLab\Scripts\SocialDialogManager folder).
 
 	````C#
 	public void OnRateClicked ()
@@ -141,7 +145,7 @@ Let's use the UnityEngine.WSA.Launcher APIs, to launch Help for our game, and to
 	}
 	````
 
-1. For our final example of this technique, and to illustrate a little more immersive integration, let's add live tiles to our game.  At the end of each round, we can add a teaser message so users can come back if they quit game in middle of a round. Our game already has a **SetLiveTile** method that gets called at end of each round.  This method will update the text on our main live tile, and set an image to scroll with the tilea to make it pop with more interactivity.   
+1. For our final example of this technique, and to illustrate a little more immersive integration, let's add live tiles to our game.  At the end of each round, we can add a teaser message so users can come back if they quit game in middle of a round. Our **GameManager** already has a **SetLiveTile** method that gets called at end of each round.  This method will update the text on our main live tile, and set an image to scroll with the tilea to make it pop with more interactivity.   
 
 	````C#
 	void SetLiveTile ( string textmessage )
