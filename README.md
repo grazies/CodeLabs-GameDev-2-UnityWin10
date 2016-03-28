@@ -457,8 +457,8 @@ Let's now review the implementation details on the Unity side.
 
 	_Add Ads SDK Reference in Visual Studio_
 
-1. Next, we need to add the implementation of our IInterstitialAd interface. Right click on the Tanks project in Solution Explorer, Select **Add**->**Existing Item** and navigate to the ExtraFiles folder in this repo.
-[If you are using a //build PC, that is under C:\labs\CodeLabs-GameDev-2-UnityWin10\Source\ExtraFiles] and select the **MSAdsBridge\MicrosoftAdsBridge.cs **file.
+1. Next, we need to add the implementation of our IInterstitialAd interface. Right click on the Tanks project in Solution Explorer, Select **Add**->**Existing Item** and navigate to the ExtraFiles folder in this repo and select the **MSAdsBridge\MicrosoftAdsBridge.cs** file.
+>If you are using a //build PC, the ExtraFiles folder is at  C:\labs\CodeLabs-GameDev-2-UnityWin10\Source\ExtraFiles. 
 
 1. Finally, add the class factory so that the Unity code knows how to instantiate ads. This can be done anywhere, but for this kind of implementation, I always prefer to do it in the **App.xaml.cs**  **InitializeUnity**; that feels like a good place to ensure we don't run into a race condition later.
 
