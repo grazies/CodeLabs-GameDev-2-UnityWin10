@@ -1,6 +1,6 @@
-// #define SHOW_VUNGLE_ADS  
-// #define SHOW_MS_ADS  
- #define EASYPLAY 
+//#define SHOW_VUNGLE_ADS  
+#define SHOW_MS_ADS  
+//#define EASYPLAY 
 
 using System.Collections;
 using UnityEngine;
@@ -9,7 +9,7 @@ using UnityEngine.UI;
 using System.Xml;
 using System;
 
-#if NETFX_CORE && WINDOWS_UWP 
+#if NETFX_CORE
 using Windows.UI.Notifications;
 using Windows.Data.Xml.Dom;   
 #endif
@@ -484,25 +484,27 @@ namespace Complete
 
         int toastId = 0;
         bool needsSessionToast = true;  
-        void ScheduleReEngageToast()
-        {
-            if (needsSessionToast)
-            {
-                string invite = "Your ammo is piling up. Let's battle!";
-                DateTime dueTime = DateTime.Now.AddSeconds(40);
+void ScheduleReEngageToast()
+{
+    if (needsSessionToast)
+    {
+        string invite = "Your ammo is piling up. Let's battle!";
+        DateTime dueTime = DateTime.Now.AddSeconds(40);
 
-                var notificationXmlDoc = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastText01);
-                var textNodeList = notificationXmlDoc.GetElementsByTagName("text");
-                if (textNodeList.Count > 0)
-                {
-                    textNodeList[0].AppendChild(notificationXmlDoc.CreateTextNode(invite));
-                    var toast = new ScheduledToastNotification(notificationXmlDoc, dueTime);
-                    toast.Id = (++toastId).ToString();
-                    ToastNotificationManager.CreateToastNotifier().AddToSchedule(toast);
-                }
-                needsSessionToast = false;
-            } 
+#if NETFX_CORE  
+        var notificationXmlDoc = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastText01);
+        var textNodeList = notificationXmlDoc.GetElementsByTagName("text");
+        if (textNodeList.Count > 0)
+        {
+            textNodeList[0].AppendChild(notificationXmlDoc.CreateTextNode(invite));
+            var toast = new ScheduledToastNotification(notificationXmlDoc, dueTime);
+            toast.Id = (++toastId).ToString();
+            ToastNotificationManager.CreateToastNotifier().AddToSchedule(toast);
         }
+#endif 
+        needsSessionToast = false;
+    } 
+}
 
          
         void SetLiveTile ( string s )
@@ -510,11 +512,7 @@ namespace Complete
             UnityEngine.WSA.Tile.main.Update("ms-appx:///Data/StreamingAssets/TanksIcon_150x150.png",
                 "ms-appx:///Data/StreamingAssets/TanksIcon_310x150.png", string.Empty, s);             
              
-        }
-
-        
-        
-          
+        } 
 
         void OnApplicationPause(bool paused)
         {             
