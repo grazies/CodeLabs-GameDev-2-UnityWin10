@@ -346,17 +346,23 @@ PlayerSettings:
   metroCertificateNotAfter: 0073f755d298d201
   metroApplicationDescription: Tanks Build was UniteEurope2015TrainingDay
   wsaImages:
-    131172: Assets/StreamingAssets/TanksSplash.png
-    131272: Assets/StreamingAssets/TanksSplash-200.png
+    65636: Assets/WindowsAssets/Tanks50x50.png
+    131172: Assets/WindowsAssets/TanksSplash.png
+    131272: Assets/WindowsAssets/TanksSplash-200.png
     720996: Assets/StreamingAssets/TanksIcon_150x150.png
     786532: Assets/StreamingAssets/TanksIcon_310x150.png
-    852068: Assets/StreamingAssets/TanksIcon30x30.png
+    852048: Assets/WindowsAssets/Tanks24x24.png
+    852068: Assets/WindowsAssets/TanksIcon30x30.png
     917604: Assets/StreamingAssets/TanksIcon_70x70.png
-    2031716: Assets/StreamingAssets/TanksIcon44x44.png
-    2097252: Assets/StreamingAssets/Tanks71x71.png
+    2031640: Assets/WindowsAssets/Tanks24x24.png
+    2031716: Assets/WindowsAssets/TanksIcon44x44.png
+    2031816: Assets/WindowsAssets/Tanks88x88.png
+    2097252: Assets/WindowsAssets/Tanks71x71.png
     2162788: Assets/StreamingAssets/TanksIcon_150x150.png
-    2228324: Assets/StreamingAssets/TanksIcon_310x310.png
+    2162888: Assets/WindowsAssets/TanksIcon_300x300.png
+    2228324: Assets/WindowsAssets/TanksIcon_310x310.png
     2293860: Assets/StreamingAssets/TanksIcon_310x150.png
+    2293960: Assets/WindowsAssets/Wide310x150Logo.scale-200.png
   metroTileShortName: Tanks
   metroCommandLineArgsFile: 
   metroTileShowName: 0
