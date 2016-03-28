@@ -34,7 +34,10 @@ namespace Complete
         private bool m_isDisplayingSocialPrompt;
         private static GameManager _instance;
 
-#if SHOW_MS_ADS 
+        private const string HelpPath = "https://github.com/Microsoft-Build-2016/CodeLabs-GameDev-2-UnityWin10/blob/master/Images/TanksHelp.jpg";
+        private const string MediumTilePath = "ms-appx:///Data/StreamingAssets/TanksIcon_150x150.png";
+        private const string WideTilePath =   "ms-appx:///Data/StreamingAssets/TanksIcon_310x150.png";
+#if SHOW_MS_ADS
         Microsoft.UnityPlugins.IInterstittialAd m_MicrosoftAd;
         private const string MicrosoftAdsAppId = "d25517cb-12d4-4699-8bdc-52040c712cab";
         private int count = 0; 
@@ -462,9 +465,9 @@ void OnAdCompleted()
             }
         }
 
-        void SetLiveTile ( string s )
+        void SetLiveTile ( string textmessage )
         {                          
-                         
+                       
         }
 
         int toastId = 0;

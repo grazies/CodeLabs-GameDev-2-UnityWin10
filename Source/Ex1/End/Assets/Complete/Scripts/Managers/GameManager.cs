@@ -39,6 +39,10 @@ namespace Complete
         private bool m_isDisplayingSocialPrompt;
         private static GameManager _instance;
 
+        private const string HelpPath = "https://github.com/Microsoft-Build-2016/CodeLabs-GameDev-2-UnityWin10/blob/master/Images/TanksHelp.jpg";         
+        private const string MediumTilePath = "ms-appx:///Data/StreamingAssets/TanksIcon_150x150.png";
+        private const string WideTilePath = "ms-appx:///Data/StreamingAssets/TanksIcon_310x150.png";
+
 #if SHOW_MS_ADS 
         Microsoft.UnityPlugins.IInterstittialAd m_MicrosoftAd;
         private const string MicrosoftAdsAppId = "d25517cb-12d4-4699-8bdc-52040c712cab";
@@ -460,14 +464,13 @@ namespace Complete
             if (Input.GetKeyUp(KeyCode.F1))
             {
             //LAB_ANSWER_BEGIN 
-               UnityEngine.WSA.Launcher.LaunchUri("ms-windows-store:REVIEW?PFN=Microsoft.Channel9_8wekyb3d8bbwe", false);
+               UnityEngine.WSA.Launcher.LaunchUri(HelpPath, false);
             //LAB_ANSWER_END 
             } 
             else if (Input.GetKeyUp (KeyCode.F11))
             {
 //LAB_ANSWER_BEGIN 
 #if NETFX_CORE && WINDOWS_UWP
-
                 //Dispatch from App to UI Thread 
                 UnityEngine.WSA.Application.InvokeOnUIThread( ()=>
                 {
@@ -507,12 +510,13 @@ void ScheduleReEngageToast()
 }
 
          
-        void SetLiveTile ( string s )
+        void SetLiveTile ( string textMessage )
         {
-            UnityEngine.WSA.Tile.main.Update("ms-appx:///Data/StreamingAssets/TanksIcon_150x150.png",
-                "ms-appx:///Data/StreamingAssets/TanksIcon_310x150.png", string.Empty, s);             
-             
-        } 
+            //LAB_ANSWER_BEGIN 
+            UnityEngine.WSA.Tile.main.Update( MediumTilePath, 
+                WideTilePath, string.Empty, textMessage);
+            //LAB_ANSWER_END  
+        }
 
         void OnApplicationPause(bool paused)
         {             

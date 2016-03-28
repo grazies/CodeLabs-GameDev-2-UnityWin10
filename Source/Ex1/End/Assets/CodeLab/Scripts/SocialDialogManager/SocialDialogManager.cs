@@ -2,9 +2,9 @@
 using System.Collections;
 
 public class SocialDialogManager : MonoBehaviour {
-
-	// Use this for initialization
-	void Start () {
+    private const string AppReviewUri = "ms-windows-store:REVIEW? PFN = Microsoft.Channel9_8wekyb3d8bbwe"; 
+    // Use this for initialization
+    void Start () {
 	
 	}
 	
@@ -16,7 +16,7 @@ public class SocialDialogManager : MonoBehaviour {
 public void OnRateClicked ()
 {
     //LAB_ANSWER_BEGIN  -- launch Windows store to rate our app. 
-    UnityEngine.WSA.Launcher.LaunchUri("ms-windows-store:REVIEW?PFN=Microsoft.Channel9_8wekyb3d8bbwe", false); 
+    UnityEngine.WSA.Launcher.LaunchUri(AppReviewUri, false); 
     //LAB_ANSWER_END 
     DismissDialog(); 
 }
