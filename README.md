@@ -300,7 +300,7 @@ If you want to dive deeper into plugins, please see this [reference](http://docs
 
 	- Check the **Don't process** checkbox.  Don't process is used to tell Unity that it should not patch the assembly. Unity needs to do extra processing to patch assemblies that have classes that need to be serialized in Unity; for most managed plugins that just add native integration, the Don't process should be checked as these assemblies rarely contain Unity serializable objects. To be precise, the setting is not required since we have a .winmd and Unity knows not to process these, but i wanted to explain the setting, so leave it checked. It this was a dll, then the setting would be needed. 
 
-	- For placeholder, point it to the VungleSDKProxy dll in the **Plugins** folder. This tells Unity to use that placeholder assembly within the Unity editor. We need placeholder assemblies because the Unity Editor is running Mono, it can't load .NET 4.5 assemblies (or WinMDs). Placeholders mimic the API signatures of the assembly we want to use, but placeholders are compiled against .NET 3.5. that way every thing compiles within the editor (susing placeholder), and it also compiles when building to target UWP (using real plugin). 
+	- For placeholder, point it to the VungleSDKProxy dll in the **Plugins** folder. This tells Unity to use that placeholder assembly when compiling to run in the Unity editor. We need placeholder assemblies because the Unity Editor is running Mono, it can't load .NET 4.5 assemblies (or WinMDs). Placeholders mimic the API signatures of the real assembly we want to use, but placeholders are compiled against .NET 3.5. that way every thing compiles within the editor (using placeholder assembly), and it also compiles when building to target UWP (using the target assembly ). 
 	- Here is our complete settings for our VungleSDKProxy in Plugins\Metro, so you can verify you made all the changes. Again, click *Apply* when you are done. 
 
 	![VungleSDKProxy.winmd Import Settings](./Images/VungleSDKProxyPluginsMetro.png "VungleSDKProxy.winmd Import Settings")
@@ -317,19 +317,10 @@ If you want to dive deeper into plugins, please see this [reference](http://docs
 
 	> **Note 1:** If you are wondering why VungleSDK does not have a placeholder, it does not need it. All possible calls to this assembly are 'brokered' through VungleSDKProxy, so we don't need a placeholder dll for this.  
 
-	> **Note 2:** That is it, we have now configured all our plugin references. If you want more details around these plugin import settings, Unity's documentation has a good overview of the [import settings](http://docs.unity3d.com/Manual/windowsstore-plugins.html).
+	> **Note 2:** If you want more details around these plugin import settings, Unity's documentation has a good overview of the [import settings](http://docs.unity3d.com/Manual/windowsstore-plugins.html).
 
-1. By adding the Vungle plugin to our Unity project we have changed what Unity needs to compile, so before we go further, we should **Build** within Unity like we did on our first task. Most of the time, when rebuilding, we  let Unity target the same folder we used earlier. What Unity would do here is update our C# projects (**Assembly-CSharp** and **Assembly-CSharp-firstpass**) and rebuild the game with all scripts and the new assets. It will however **not** update our UWP project, because once Unity outputs it once, it does not override the .csproj, the XAML and C# files, etc. Of course this is a problem, as we need for our project to have the new references (_to VungleSDK.winmd_). To get around this hiccup, we can do one of two options:
-
-	- Since we had not made any changes to the project exported by Unity, we can just build to a different folder, and have it create a new project for us to use.
-
-	- We can edit the _unityoverwrite.txt_ file in our previously exported folder (Win10Solution if you used default name) and delete the line that has Tanks.csproj. The line looks like the one below (though your hash will be different). Again you should delete it and save your _unityoverwrite.txt_ file.  By us deleting this line, Unity will know to override it next time we Build. 
-
-		````
-		Tanks\Tanks.csproj: 49CB64084B043D447B36B13D5F2CF44D
-		````
-
-1. Now we can **Build** and Unity will overwrite the .csproj and include our new references. Of course, in the real-world if you had modified Tanks.csproj by adding more files or changing other settings you would have to merge it. The file is xml, so it is easy to compare and merge.
+1. By adding the Vungle plugin to our Unity project we have changed what Unity needs to compile, so before we go further, we should **Build** within Unity like we did on our first task. 
+> Note: Unity is going to re-create our projects (.csproj files) for our three projects since it needs to update the references to these so they include VungleSDK.   If you get a prompt in Visual Studio to reload the projects, accept the prompt, by clicking **Reload All**. 
 
 1. After Unity builds, confirm the new _Tanks.csproj_ has a reference to **VungleSDK** and **VungleSDKProxy**; if that looks right, rebuild all just to ensure it is all working correctly.
 
@@ -367,6 +358,12 @@ If you want to dive deeper into plugins, please see this [reference](http://docs
 1. In GameManager's **RoundEnding** function we call the **ShowAd** method, which first mutes the background music, then calls **Vungle.showAd** and sets a flag so the game loop knows to wait for ad to complete (**m_isDisplayingAd**).
 
 With that, we are now ready to test ads in our game.
+
+>Note: If after uncommenting the #define SHOW_VUNGLE_ADS you get an error that looks like this: "The type or namespace name AdfinishedEventArgs could not be found" it means Unity did not refresh the reference to Assembly-CSharp-firstpass.dll. Implement this workaround: <br /> 
+    1. Expand Assembly-CSharp project's references. <br /> 
+    2. Look at the properties for the Assembly-CSharp-firstpass reference and locate the Path property.  If you are using the //build configuration, the path is c:\labs\CodeLabs-GameDev-2-UnityWin10\Source\Ex1\Begin\UWP\Assembly-CSharp\bin\x86\Debug\Assembly-CSharp-firstpass.dll.  <br /> 
+    3. Once you have the path, in Windows Explorer, navigate to the containing folder and delete that dll.  <br /> 
+    4. Rebuild in Visual Studio. <br /> 
 
 #### Let's see it!####
 To see Vungle ads, just run the game and win two rounds. After the second round, the ad will show up.  
