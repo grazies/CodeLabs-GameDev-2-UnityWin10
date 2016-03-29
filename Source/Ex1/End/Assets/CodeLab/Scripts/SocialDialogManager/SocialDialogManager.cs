@@ -2,7 +2,7 @@
 using System.Collections;
 
 public class SocialDialogManager : MonoBehaviour {
-    private const string AppReviewUri = "ms-windows-store:REVIEW? PFN = Microsoft.Channel9_8wekyb3d8bbwe"; 
+    private const string AppReviewUri = "ms-windows-store:REVIEW?PFN=Microsoft.Channel9_8wekyb3d8bbwe"; 
     // Use this for initialization
     void Start () {
 	

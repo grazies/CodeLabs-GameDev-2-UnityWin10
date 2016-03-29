@@ -494,6 +494,7 @@ void ScheduleReEngageToast()
         string invite = "Your ammo is piling up. Let's battle!";
         DateTime dueTime = DateTime.Now.AddSeconds(40);
 
+//LAB_ANSWER_BEGIN 
 #if NETFX_CORE  
         var notificationXmlDoc = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastText01);
         var textNodeList = notificationXmlDoc.GetElementsByTagName("text");
@@ -505,6 +506,9 @@ void ScheduleReEngageToast()
             ToastNotificationManager.CreateToastNotifier().AddToSchedule(toast);
         }
 #endif 
+//LAB_ANSWER_END 
+
+
         needsSessionToast = false;
     } 
 }

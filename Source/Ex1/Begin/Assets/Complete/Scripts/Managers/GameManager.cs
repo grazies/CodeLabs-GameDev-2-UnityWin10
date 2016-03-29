@@ -22,21 +22,21 @@ namespace Complete
         public GameObject m_TankPrefab;             // Reference to the prefab the players will control.
         public TankManager[] m_Tanks;               // A collection of managers for enabling and disabling different aspects of the tanks.
 
-        
+
         private int m_RoundNumber;                  // Which round the game is currently on.
         private WaitForSeconds m_StartWait;         // Used to have a delay whilst the round starts.
         private WaitForSeconds m_EndWait;           // Used to have a delay whilst the round or game ends.
         private TankManager m_RoundWinner;          // Reference to the winner of the current round.  Used to make an announcement of who won.
         private TankManager m_GameWinner;           // Reference to the winner of the game.  Used to make an announcement of who won.
-        private bool m_showAds = false ;
+        private bool m_showAds = false;
         private bool m_isDisplayingAd;
-        private bool m_showSocialPrompt;         
+        private bool m_showSocialPrompt;
         private bool m_isDisplayingSocialPrompt;
         private static GameManager _instance;
 
         private const string HelpPath = "https://github.com/Microsoft-Build-2016/CodeLabs-GameDev-2-UnityWin10/blob/master/Images/TanksHelp.jpg";
         private const string MediumTilePath = "ms-appx:///Data/StreamingAssets/TanksIcon_150x150.png";
-        private const string WideTilePath =   "ms-appx:///Data/StreamingAssets/TanksIcon_310x150.png";
+        private const string WideTilePath = "ms-appx:///Data/StreamingAssets/TanksIcon_310x150.png";
 #if SHOW_MS_ADS
         Microsoft.UnityPlugins.IInterstittialAd m_MicrosoftAd;
         private const string MicrosoftAdsAppId = "d25517cb-12d4-4699-8bdc-52040c712cab";
@@ -45,17 +45,16 @@ namespace Complete
         {
             get
             {
-
                 string[] adUnitIds = new string[] { "11389925", "11389925"  };
                 return adUnitIds[count++ % adUnitIds.Length];
             }
         }
 #endif
 
-        public static GameManager Instance { get { return _instance;  } }
+        public static GameManager Instance { get { return _instance; } }
         private void Start()
         {
-            Debug.Assert(_instance == null); 
+            Debug.Assert(_instance == null);
             _instance = this;
 
 #if EASYPLAY
@@ -75,14 +74,14 @@ namespace Complete
             UnityEngine.WSA.Application.windowActivated += Application_windowActivated;
 #endif 
             // Create the delays so they only have to be made once.
-            m_StartWait = new WaitForSeconds (m_StartDelay);
-            m_EndWait = new WaitForSeconds (m_EndDelay);
+            m_StartWait = new WaitForSeconds(m_StartDelay);
+            m_EndWait = new WaitForSeconds(m_EndDelay);
 
             SpawnAllTanks();
             SetCameraTargets();
 
             // Once the tanks have been created and the camera is using them as targets, start the game.
-            StartCoroutine (GameLoop ());
+            StartCoroutine(GameLoop());
             m_showSocialPrompt = true;
 #if SHOW_VUNGLE_ADS && !UNITY_EDITOR
             //LAB: Initialize Vungle ADS 
@@ -103,20 +102,20 @@ namespace Complete
                 m_MicrosoftAd.Request(MicrosoftAdsAppId, NextMicrosoftAd, Microsoft.UnityPlugins.AdType.Video); 
             }
 #endif
-        }    
+        }
 
         private void Application_windowActivated(UnityEngine.WSA.WindowActivationState state)
         {
-            AudioListener.pause = (state == UnityEngine.WSA.WindowActivationState.Deactivated);            
+            AudioListener.pause = (state == UnityEngine.WSA.WindowActivationState.Deactivated);
         }
 
-        void ToggleMute ( bool newMuteValue)
-        {                 
+        void ToggleMute(bool newMuteValue)
+        {
             GetComponent<AudioSource>().mute = newMuteValue;
             foreach (var tank in m_Tanks)
             {
                 tank.Mute = newMuteValue;
-            }   
+            }
         }
 
 #if SHOW_VUNGLE_ADS
@@ -143,26 +142,26 @@ namespace Complete
         }        
 #endif
 
-void OnAdCompleted()
-{
-    m_isDisplayingAd = false;
-    if (!UnityEngine.WSA.Application.RunningOnAppThread())
-    {
-        UnityEngine.WSA.Application.InvokeOnAppThread(() =>
+        void OnAdCompleted()
         {
-            ToggleMute(false);
-        }, false);
-    }
-    else
-        ToggleMute(false);
-}
-
-        void ShowAd ()
-        {
-            GetComponent<AudioSource>().mute = true ; 
-            foreach ( var tank in m_Tanks )
+            m_isDisplayingAd = false;
+            if (!UnityEngine.WSA.Application.RunningOnAppThread())
             {
-                tank.Mute = true; 
+                UnityEngine.WSA.Application.InvokeOnAppThread(() =>
+                {
+                    ToggleMute(false);
+                }, false);
+            }
+            else
+                ToggleMute(false);
+        }
+
+        void ShowAd()
+        {
+            GetComponent<AudioSource>().mute = true;
+            foreach (var tank in m_Tanks)
+            {
+                tank.Mute = true;
             }
 #if SHOW_VUNGLE_ADS
             Vungle.playAd();
@@ -177,8 +176,8 @@ void OnAdCompleted()
 
         void ShowSocialPrompt()
         {
-            GameObject canvas = GameObject.Find("SocialCanvas"); 
-            if ( canvas != null )
+            GameObject canvas = GameObject.Find("SocialCanvas");
+            if (canvas != null)
             {
                 Transform panel = canvas.transform.GetChild(0);
                 if (panel != null)
@@ -189,7 +188,7 @@ void OnAdCompleted()
             }
         }
 
-        
+
         private void SpawnAllTanks()
         {
             // For all the tanks...
@@ -222,60 +221,60 @@ void OnAdCompleted()
 
 
         // This is called from start and will run each phase of the game one after another.
-        private IEnumerator GameLoop ()
+        private IEnumerator GameLoop()
         {
             // Start off by running the 'RoundStarting' coroutine but don't return until it's finished.
-            yield return StartCoroutine (RoundStarting ());
+            yield return StartCoroutine(RoundStarting());
 
             // Once the 'RoundStarting' coroutine is finished, run the 'RoundPlaying' coroutine but don't return until it's finished.
-            yield return StartCoroutine (RoundPlaying());
+            yield return StartCoroutine(RoundPlaying());
 
             // Once execution has returned here, run the 'RoundEnding' coroutine, again don't return until it's finished.
-            yield return StartCoroutine (RoundEnding());
+            yield return StartCoroutine(RoundEnding());
 
             // This code is not run until 'RoundEnding' has finished.  At which point, check if a game winner has been found.
             if (m_GameWinner != null)
             {
                 // If there is a game winner, restart the level.
-                SceneManager.LoadScene (0);
+                SceneManager.LoadScene(0);
             }
             else
             {
                 // If there isn't a winner yet, restart this coroutine so the loop continues.
                 // Note that this coroutine doesn't yield.  This means that the current version of the GameLoop will end.                 
-                StartCoroutine (GameLoop ());
+                StartCoroutine(GameLoop());
             }
         }
 
 
-        private IEnumerator RoundStarting ()
+        private IEnumerator RoundStarting()
         {
             // As soon as the round starts reset the tanks and make sure they can't move.
-            ResetAllTanks ();
-            DisableTankControl ();
+            ResetAllTanks();
+            DisableTankControl();
 
             // Snap the camera's zoom and position to something appropriate for the reset tanks.
-            m_CameraControl.SetStartPositionAndSize ();
+            m_CameraControl.SetStartPositionAndSize();
 
             // Increment the round number and display text showing the players what round it is.
             m_RoundNumber++;
             m_MessageText.text = "ROUND " + m_RoundNumber;
-            m_HelpText.text = "For help, press F1"; 
+            m_HelpText.text = "For help, press F1";
             // Wait for the specified length of time until yielding control back to the game loop.
             yield return m_StartWait;
         }
 
 
-        private IEnumerator RoundPlaying ()
+        private IEnumerator RoundPlaying()
         {
-                     
+
 
             // As soon as the round begins playing let the players control the tanks.
-            EnableTankControl ();
+            EnableTankControl();
 
             // Clear the text from the screen.
             m_MessageText.text = string.Empty;
-            m_HelpText.text = string.Empty; 
+            m_HelpText.text = string.Empty;
             // While there is not one tank left...
             while (!OneTankLeft())
             {
@@ -285,31 +284,31 @@ void OnAdCompleted()
         }
 
 
-        private IEnumerator RoundEnding ()
+        private IEnumerator RoundEnding()
         {
             // Stop tanks from moving.
-            DisableTankControl ();
+            DisableTankControl();
 
             // Clear the winner from the previous round.
             m_RoundWinner = null;
 
             // See if there is a winner now the round is over.
-            m_RoundWinner = GetRoundWinner ();
+            m_RoundWinner = GetRoundWinner();
 
             // If there is a winner, increment their score.
             if (m_RoundWinner != null)
                 m_RoundWinner.m_Wins++;
 
             // Now the winner's score has been incremented, see if someone has one the game.
-            m_GameWinner = GetGameWinner ();
+            m_GameWinner = GetGameWinner();
 
             // Get a message based on the scores and whether or not there is a game winner and display it.
-            string message = EndMessage ();
+            string message = EndMessage();
             m_MessageText.text = message;
             bool isEndOfGame = m_GameWinner != null;
 #if WINDOWS_UWP
-            SetLiveTile( GetTileMessage(isEndOfGame) );
-            ScheduleReEngageToast (); 
+            SetLiveTile(GetTileMessage(isEndOfGame));
+            ScheduleReEngageToast();
 #endif
             // Wait for the specified length of time until yielding control back to the game loop.
             yield return m_EndWait;
@@ -326,7 +325,7 @@ void OnAdCompleted()
 
             while (m_isDisplayingAd || m_isDisplayingSocialPrompt)
             {
-                yield return null;                 
+                yield return null;
             }
             Debug.Log("Round Ended");
         }
@@ -349,8 +348,8 @@ void OnAdCompleted()
             // If there are one or fewer tanks remaining return true, otherwise return false.
             return numTanksLeft <= 1;
         }
-        
-        
+
+
         // This function is to find out if there is a winner of the round.
         // This function is called with the assumption that 1 or fewer tanks are currently active.
         private TankManager GetRoundWinner()
@@ -453,21 +452,21 @@ void OnAdCompleted()
             }
         }
 
-        void Update ()
+        void Update()
         {
             if (Input.GetKeyUp(KeyCode.F1))
             {
-                
+
             }
-            else if (Input.GetKeyUp (KeyCode.F11))
+            else if (Input.GetKeyUp(KeyCode.F11))
             {
 
             }
         }
 
-        void SetLiveTile ( string textmessage )
-        {                          
-                       
+        void SetLiveTile(string textmessage)
+        {
+
         }
 
         int toastId = 0;
@@ -485,7 +484,7 @@ void OnAdCompleted()
         }
 
         void OnApplicationPause(bool paused)
-        {             
+        {
             if (paused)
             {
 #if SHOW_VUNGLE_ADS
@@ -496,17 +495,86 @@ void OnAdCompleted()
 #if SHOW_VUNGLE_ADS
                 Vungle.onResume();
 #endif 
-            }                      
+            }
         }
 
-        public void BroadCast( string message )
+        public void BroadCast(string message)
         {
-            if ( message == "SocialDialogDismissed")
+            if (message == "SocialDialogDismissed")
             {
-                m_isDisplayingSocialPrompt = false; 
+                m_isDisplayingSocialPrompt = false;
             }
-           // No need to truly broadcast, nobody is listening 
-           // BroadCast(message); 
+            // No need to truly broadcast, nobody is listening 
+            // BroadCast(message); 
         }
     }
+
+
+    /*Already typed Exercises */
+    /* 
+    void Update()
+    {
+        if (Input.GetKeyUp(KeyCode.F1))
+        {
+            //LAB_ANSWER_BEGIN 
+            UnityEngine.WSA.Launcher.LaunchUri(HelpPath, false);
+            //LAB_ANSWER_END 
+        }
+        else if (Input.GetKeyUp(KeyCode.F11))
+        {
+            //LAB_ANSWER_BEGIN 
+#if NETFX_CORE && WINDOWS_UWP
+            //Dispatch from App to UI Thread 
+            UnityEngine.WSA.Application.InvokeOnUIThread(() =>
+            {
+                var appView = Windows.UI.ViewManagement.ApplicationView.GetForCurrentView();
+                if (appView.IsFullScreen)
+                    appView.ExitFullScreenMode();
+                else
+                    appView.TryEnterFullScreenMode();
+            }, false);
+#endif
+            //LAB_ANSWER_END 
+        }
+    }*/
+
+
+    /* 
+    void ScheduleReEngageToast()
+       {
+           if (needsSessionToast)
+           {
+               string invite = "Your ammo is piling up. Let's battle!";
+               DateTime dueTime = DateTime.Now.AddSeconds(40);
+
+               //LAB_ANSWER_BEGIN 
+   #if NETFX_CORE
+               var notificationXmlDoc = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastText01);
+               var textNodeList = notificationXmlDoc.GetElementsByTagName("text");
+               if (textNodeList.Count > 0)
+               {
+                   textNodeList[0].AppendChild(notificationXmlDoc.CreateTextNode(invite));
+                   var toast = new ScheduledToastNotification(notificationXmlDoc, dueTime);
+                   toast.Id = (++toastId).ToString();
+                   ToastNotificationManager.CreateToastNotifier().AddToSchedule(toast);
+               }
+   #endif
+               //LAB_ANSWER_END 
+
+
+               needsSessionToast = false;
+           }
+       } */
+
+    /* 
+    void SetLiveTile ( string textMessage )
+    {
+        //LAB_ANSWER_BEGIN 
+        UnityEngine.WSA.Tile.main.Update( MediumTilePath, 
+            WideTilePath, string.Empty, textMessage);
+        //LAB_ANSWER_END  
+    }
+    */
+
 }
+ 
