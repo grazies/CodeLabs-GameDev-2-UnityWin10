@@ -11,7 +11,7 @@ A great game should include both great game play and native platform integration
 
 In this module, you will learn about these concepts:
 
-- Understand the different #define pre-processors for writing native code on a Windows game.
+- Understand the different #define pre-processor directives for writing native code on a Windows game.
 - Understand how to dispatch calls between Unity's app thread and Windows' UI thread.
 - Integrate with Windows 10 by writing inline code to your Unity game.
 - Integrate with Windows 10 by consuming and configuring Unity plugins.
@@ -65,7 +65,7 @@ Estimated time to complete this module: **60 minutes**
 
 	_Build Action_
 
-1. Before we click **Build** we should also set our Player Settings. Click the **Player Settings** button.
+1. Before we click **Build**, we should also set our Player Settings. Click the **Player Settings** button.
 
 1. In player settings you can configure the name of your app, the splash screen, icons and tiles, orientation, rendering options, sensors, capabilities, and many other options. Explore all of these and feel free to change them.
 
@@ -134,7 +134,7 @@ Let's use the UnityEngine.WSA.Launcher APIs, to launch Help for our game, and to
 	}
 	````
 
-1. This same technique can be used to implement the 'Rate us' functionality. There is already a "Rate us" button in the game. For demo purposes, it is coded to come up every 4th time you finish a round. So all we have to do is add code the **OnRateClicked** in the **SocialDialogManager** Behaviour (this file is located in CodeLab\Scripts\SocialDialogManager folder).
+1. This same technique can be used to implement the 'Rate us' functionality. There is already a "Rate us" button in the game. For demo purposes, it is coded to come up every 4th time you finish a round. So all we have to do is add code to the **OnRateClicked** event handler in the **SocialDialogManager** Behaviour (this file is located in CodeLab\Scripts\SocialDialogManager folder).
 
 	````C#
 	public void OnRateClicked ()
@@ -168,7 +168,7 @@ To see the live tile, you do need to have it pinned to your Start menu. You can 
 
 These UnityEngine.WSA.* APIs are convenient and easy to use. You did not notice this yet (we will cover it next), but there are threading requirements the API is abstracting and handling for you, we will explore these in our next exercise. 
 
-Unfortunately, the APIs are also limited. They do not handle all native integration scenarios. No worries though, there are more options, let's explore our next one: writing inline code in your Unity project to access WinRT APIs.    
+Unfortunately, the UnityEngine.WSA APIs do not handle all native integration scenarios. No worries though, there are more options, let's explore our next one: writing inline code in your Unity project to access WinRT APIs.    
 
 
 <a name="Exercise3"></a>
@@ -180,7 +180,7 @@ To inline WinRT code into your Unity project all you need to do is protect yours
 
 Unity's documentation has more guidance on [pre-processors defines for platform specific compilation](http://docs.unity3d.com/Manual/PlatformDependentCompilation.html).  For today' exercises we will use these directives:
 
-- **NETFX_CORE** to filter for compiling with .NET Core (the C# compiler) and linking to WinRT.
+- **NETFX_CORE** to filter for code that compiles against .NET Coreand links to WinRT.
 - **WINDOWS_UWP** to ensure code is used only on Windows 10, when APIs are Windows 10 specific.
 - **UNITY_EDITOR** to filter out code that only runs in the editor.
 
@@ -210,7 +210,7 @@ Here are the relevant details to notice from our snippet:
 	- **Application.InvokeOnUIThread** used to dispatch a call from Unity's app thread to Windows' UI thread
 	- **Application.InvokeOnAppThread** used to dispatch calls from any thread to Unity's app thread.
 
-In our case, **ApplicationView.TryEnterFullScreenMode** requires that it be called from the UI thread, that is why we dispatched the call, but not all WinRT calls need to be dispatched. For example, scheduled local toast notifications (which can be used to reengage users) can run from the Unity App thread and don't need dispatching.   Our game is already stubbed to schedule a toast notification, it has a **ScheduleReEngagement** method in GameManager.cs, where we can add some notification code: 
+In our case, **ApplicationView.TryEnterFullScreenMode** requires that it be called from the UI thread, that is why we dispatched the call, but not all WinRT calls need to be dispatched. For example, scheduled local toast notifications (which can be used to reengage users) can run from the Unity App thread and doesn't need dispatching.   Our game is already stubbed to schedule a toast notification, it has a **ScheduleReEngagement** method in GameManager.cs, where we can add some notification code: 
 
 ````C# 	
 void ScheduleReEngageToast()
@@ -285,7 +285,7 @@ If you want to dive deeper into plugins, please see this [reference](http://docs
 
 	 - There is a **WindowsPhone81** folder, since Vungle supports Windows Phone 8.1 too. We are not going to need that today, so <u>delete that Windows Phone 81 folder and its contents</u>.
 
-1. Let's now configure the rest of our SDK references, pay close attention as there is a lot details here. Go to the **Plugins** Folder and notice the **VungleSDKProxy.dll.** This DLL since is at the root of the plugins folder right now is applicable to all platforms. Click the dll to see it's import settings, ensure the plugin's selected platform is Editor. This will be used only when running in the Editor. Click **Apply** after you make your changes. 
+1. Let's now configure the rest of our SDK references, pay close attention as there is a lot details here. Go to the **Plugins** Folder and notice the **VungleSDKProxy.dll.** This DLL since is at the root of the plugins folder right now is applicable to all platforms. Click the dll to see it's import settings, ensure the plugin's selected platform is **Editor** (for this, uncheck the *Any Platform* box and check *Editor*). This will be used only when running in the Editor. Click **Apply** after you make your changes. 
 
 	![VungleSDKProxy Import Settings](./Images/VungleSDKProxy.png "VungleSDKProxy Import Settings")
 
@@ -298,16 +298,16 @@ If you want to dive deeper into plugins, please see this [reference](http://docs
 
 	- The _Scripting Backend_ should be **Dotnet**
 
-	- Check the **Don't process** checkbox.  Don't process is used to tell Unity that it should not patch the assembly. Unity needs to do extra processing to patch assemblies that have classes that need to be serialized in Unity; for most managed plugins that just add native integration, the Don't process should be checked as these assemblies rarely contain Unity serializable objects. To be 100% accurate, the setting is not required since we have a .winmd, and not a .dll, but i wanted to explain the setting, so leave it checked.
+	- Check the **Don't process** checkbox.  Don't process is used to tell Unity that it should not patch the assembly. Unity needs to do extra processing to patch assemblies that have classes that need to be serialized in Unity; for most managed plugins that just add native integration, the Don't process should be checked as these assemblies rarely contain Unity serializable objects. To be precise, the setting is not required since we have a .winmd and Unity knows not to process these, but i wanted to explain the setting, so leave it checked. It this was a dll, then the setting would be needed. 
 
-	- For placeholder, point it to the VungleSDKProxy dll in the **Plugins** folder. This tells Unity to use that placeholder assembly within the Unity editor. We need placeholder assemblies because the Unity Editor is running Mono, it can't load .NET 4.5 assemblies (or WinMDs). Placeholders mimic the API signatures of the assembly we want to use, but placeholders are compiled against .NET 3.5. that way every thing compiles within editor (using placeholder), and when building to target UWP (using real plugin). 
+	- For placeholder, point it to the VungleSDKProxy dll in the **Plugins** folder. This tells Unity to use that placeholder assembly within the Unity editor. We need placeholder assemblies because the Unity Editor is running Mono, it can't load .NET 4.5 assemblies (or WinMDs). Placeholders mimic the API signatures of the assembly we want to use, but placeholders are compiled against .NET 3.5. that way every thing compiles within the editor (susing placeholder), and it also compiles when building to target UWP (using real plugin). 
 	- Here is our complete settings for our VungleSDKProxy in Plugins\Metro, so you can verify you made all the changes. Again, click *Apply* when you are done. 
 
 	![VungleSDKProxy.winmd Import Settings](./Images/VungleSDKProxyPluginsMetro.png "VungleSDKProxy.winmd Import Settings")
 
 	_VungleSDKProxy.winmd Import Settings_
 
-1. Next, delete the **VungleSDK.winmd** file in the **Plugins\Metro** folder. We won't use this as we are going to configure the one under UWP folder.  The Vungle package includes this extra file to workaround an issue in earlier versions of Unity. Do pay attention to the folder and make sure you only delete the one in Plugins\Metro, not the one in Plugins\Metro\UWP. 
+1. Next, delete the **VungleSDK.winmd** file in the **Plugins\Metro** folder. The Vungle package includes this extra file to workaround an issue in earlier versions of Unity, but for 5.3.3 and later we don't need it. Do pay attention to the folder and make sure you only delete the one in Plugins\Metro, not the one in Plugins\Metro\UWP. 
 
 2. Next, we can configure **VungleSDK.winmd** in **Plugins\Metro\UWP** using these settings. 
 
@@ -335,7 +335,7 @@ If you want to dive deeper into plugins, please see this [reference](http://docs
 
 1. Now that we have our references configured within Unity and have recompiled, we can call the code to show the ads. Let's go back to Visual Studio.
 
-1. To save you a little typing time (and since the logic is simple and not critical to Windows integration, the code is written, but excluded via a `#if USE_VUNGLE_ADS` pre-processor. Go to the top of the **GameManager.cs** file, and uncomment out the `#define USE_VUNGLE_ADS` line and let's now review how Vungle is getting called. 
+1. To save you a little typing time (and since the logic is simple and not critical to Windows integration, the code is written, but excluded via a `#if SHOW_VUNGLE_ADS` pre-processor. Go to the top of the **GameManager.cs** file, and uncomment out the `#define SHOW_VUNGLE_ADS` line and let's now review how Vungle is getting called. 
 
 1. In the **Start** function,  we initialize Vungle and subscribe to adCompleted event.
 
@@ -475,7 +475,7 @@ To see Microsoft ads in action, just run the game and win two rounds. After the 
 
 #### Discussion around bridge technique ####
 
-The bridge pattern can be handy to avoid lots of platform specific dependencies (if you have a winmd that depends on native libraries that will be different for ARM/x86/x64) it can be easier to do it on the UWP side than on Windows.  It is also easier to manage nuget references that auto-update themselves and can be restored automatically.  This example mostly should give you context on the many options you have to integrate Unity games w/ native WinRT functionality; referencing .NET assemblies, nuget packages, etc. It all works, since we are just using Visual Studio to manage app and nuget references.  
+The bridge pattern can be handy to avoid lots of platform specific dependencies (if you have a winmd that depends on native libraries that will be different for ARM/x86/x64) it can be easier to do it on the UWP side than on Windows.  It is also easier to manage nuget references that auto-update themselves and can be restored automatically.  This example mostly should give you context on the many options you have to integrate Unity games with native WinRT functionality; referencing .NET assemblies, nuget packages, etc. It all works, since we are just using Visual Studio to manage app and nuget references.  
 
 <a name="Summary" />
 ## Summary ##
