@@ -1,6 +1,6 @@
 // #define SHOW_VUNGLE_ADS  
-// #define SHOW_MS_ADS  
-// #define EASYPLAY 
+#define SHOW_MS_ADS  
+#define EASYPLAY 
 
 using System.Collections;
 using UnityEngine;
@@ -88,7 +88,8 @@ namespace Complete
             m_showAds = true;
             // REPLACE WITH YOUR OWN APP IDS!
             Vungle.init("com.prime31.Vungle", "vungleTest", "vungleTest");
-            Vungle.onAdFinishedEvent += OnAdFinished;  
+            Vungle.onAdFinishedEvent += OnAdFinished;
+            Vungle.onAdEndedEvent += Vungle_onAdEndedEvent;
                    
 #elif SHOW_MS_ADS && !UNITY_EDITOR
             //LAB: Initialize Microsoft Ads 
@@ -104,6 +105,12 @@ namespace Complete
 #endif
         }
 
+#if SHOW_VUNGLE_ADS
+        private void Vungle_onAdEndedEvent()
+        {
+            OnAdCompleted(); 
+        }
+#endif 
         private void Application_windowActivated(UnityEngine.WSA.WindowActivationState state)
         {
             AudioListener.pause = (state == UnityEngine.WSA.WindowActivationState.Deactivated);
@@ -130,10 +137,18 @@ namespace Complete
             OnAdCompleted();
             m_MicrosoftAd.Request(MicrosoftAdsAppId, NextMicrosoftAd, Microsoft.UnityPlugins.AdType.Video);
         }
-        void OnMSAdError(object unused)
+        void OnMSAdError(object args)
         {
-            OnAdCompleted();
-            m_MicrosoftAd.Request(MicrosoftAdsAppId, NextMicrosoftAd, Microsoft.UnityPlugins.AdType.Video);
+            if (m_isDisplayingAd)
+            {
+                OnAdCompleted();
+            }
+            var error = args as Microsoft.UnityPlugins.AdErrorEventArgs; 
+            if ( error != null )
+            {
+                if ( error.ErrorCode != Microsoft.UnityPlugins.ErrorCode.NetworkConnectionFailure && m_MicrosoftAd != null )
+                    m_MicrosoftAd.Request(MicrosoftAdsAppId, NextMicrosoftAd, Microsoft.UnityPlugins.AdType.Video);
+            }
         }
         void OnMSAdCancelled(object unused)
         {
@@ -164,8 +179,16 @@ namespace Complete
                 tank.Mute = true;
             }
 #if SHOW_VUNGLE_ADS
-            Vungle.playAd();
-#elif SHOW_MS_ADS 
+            if (Vungle.isAdvertAvailable())
+            {
+                Vungle.playAd();
+            }
+            else
+            { 
+                OnAdCompleted();
+                return; 
+            }
+#elif SHOW_MS_ADS
             if (m_MicrosoftAd.State == Microsoft.UnityPlugins.InterstitialAdState.Ready)
                 m_MicrosoftAd.Show();
             else
@@ -489,12 +512,12 @@ namespace Complete
             {
 #if SHOW_VUNGLE_ADS
                 Vungle.onPause();
-#endif 
+#endif
             }
             else {
 #if SHOW_VUNGLE_ADS
                 Vungle.onResume();
-#endif 
+#endif
             }
         }
 
@@ -548,7 +571,7 @@ namespace Complete
                DateTime dueTime = DateTime.Now.AddSeconds(40);
 
                //LAB_ANSWER_BEGIN 
-   #if NETFX_CORE
+#if NETFX_CORE
                var notificationXmlDoc = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastText01);
                var textNodeList = notificationXmlDoc.GetElementsByTagName("text");
                if (textNodeList.Count > 0)
@@ -558,7 +581,7 @@ namespace Complete
                    toast.Id = (++toastId).ToString();
                    ToastNotificationManager.CreateToastNotifier().AddToSchedule(toast);
                }
-   #endif
+#endif
                //LAB_ANSWER_END 
 
 
