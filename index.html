@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Codelabs-gamedev-2-unitywin10 by grazies</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Codelabs-gamedev-2-unitywin10</h1>
+      <h2 class="project-tagline">Lighting Up Your Unity Game on Windows 10</h2>
+      <a href="https://github.com/grazies/CodeLabs-GameDev-2-UnityWin10" class="btn">View on GitHub</a>
+      <a href="https://github.com/grazies/CodeLabs-GameDev-2-UnityWin10/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/grazies/CodeLabs-GameDev-2-UnityWin10/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <p><a name="HOLTop"></a></p>
+
+<h1>
+<a id="integrating-unity-games-with-windows-10" class="anchor" href="#integrating-unity-games-with-windows-10" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Integrating Unity Games With Windows 10</h1>
+
+<p><a name="Overview"></a></p>
+
+<h2>
+<a id="overview" class="anchor" href="#overview" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Overview</h2>
+
+<p>A great game should include both great game play and native platform integration that engages and aids the user to get the most out of the game. This lab will give you an overview of different techniques you can use to integrate with the Universal Windows Platform from within your Unity game; we will discuss some of the pros &amp; cons of each approach so you can reuse these techniques across any  integration scenario you may encounter.    </p>
+
+<p><a name="Objectives"></a></p>
+
+<h3>
+<a id="objectives" class="anchor" href="#objectives" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Objectives</h3>
+
+<p>In this module, you will learn about these concepts:</p>
+
+<ul>
+<li>Understand the different #define pre-processor directives for writing native code on a Windows game.</li>
+<li>Understand how to dispatch calls between Unity's app thread and Windows' UI thread.</li>
+<li>Integrate with Windows 10 by writing inline code to your Unity game.</li>
+<li>Integrate with Windows 10 by consuming and configuring Unity plugins.</li>
+</ul>
+
+<blockquote>
+<p><strong>Note:</strong> This module is optimized to show you integration techniques. Most of the Unity code (game play, menus, event handlers) has been coded for you; you will need to inject the native code at right places, but the module does not explain the 'glue' code we wrote in Unity. You will be able to walk through that on your own (as you have all the source). If you want to learn how to write the game, you can find very detailed  video tutorials for building the game at <a href="https://unity3d.com/learn/tutorials/projects/tanks-tutorial">Unity's learning site</a>.</p>
+</blockquote>
+
+<p><a name="Prerequisites"></a></p>
+
+<h3>
+<a id="prerequisites" class="anchor" href="#prerequisites" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Prerequisites</h3>
+
+<p>The following software is required to complete this module:</p>
+
+<ul>
+<li>
+<a href="https://www.visualstudio.com/products/visual-studio-community-vs">Visual Studio Community 2015</a> or greater. </li>
+<li>
+<a href="http://unity3d.com/get-unity/update">Unity 5.3.3f1</a> or later.</li>
+<li>The 'starter' solution for this module. You can get it from <a href="https://github.com/Microsoft-Build-2016/CodeLabs-GameDev-2-UnityWin10.git">Microsoft-Build-2016/CodeLabs-GameDev-2-UnityWin10</a> github repository. The repo only shows Ex1 (as in Exercise 1) but that works for all exercises in this module. </li>
+</ul>
+
+<p>The following software packages are used within the module. These can be optional, as you can choose to skip the exercises, but covering all exercises is recommended for the most comprehensive learning; to do all exercuses, you should install these extra  pre-requisites.</p>
+
+<ul>
+<li>Vungle's Unity plugin. For <em>//build</em> event, we have included this in the 'extra files' in the repo.  Post <em>//build</em> event, you should get it from <a href="https://github.com/Vungle/Unity-Plugin">Vungle's github repo</a>
+</li>
+<li><a href="https://visualstudiogallery.msdn.microsoft.com/401703a0-263e-4949-8f0f-738305d6ef4b">Microsoft Universal Ads SDK</a></li>
+</ul>
+
+<p><a name="Exercises"></a></p>
+
+<h2>
+<a id="exercises" class="anchor" href="#exercises" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Exercises</h2>
+
+<p>This module includes the following exercises:</p>
+
+<ol>
+<li><a href="#Exercise1">Exporting Unity Project to Windows Store with C# Projects</a></li>
+<li><a href="#Exercise2">Using Unity's native integration helper libraries</a></li>
+<li><a href="#Exercise3">Adding WinRT inline code to a Unity game</a></li>
+<li><a href="#Exercise4">Configuring a reference to a Unity plugin</a></li>
+<li><a href="#Exercise5">Taking a bridge approach to integration</a></li>
+</ol>
+
+<p>Estimated time to complete this module: <strong>60 minutes</strong></p>
+
+<p><a name="Exercise1"></a></p>
+
+<h3>
+<a id="exercise-1-exporting-unity-project-to-windows-store-with-c-projects" class="anchor" href="#exercise-1-exporting-unity-project-to-windows-store-with-c-projects" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Exercise 1: Exporting Unity Project to Windows Store with C# Projects</h3>
+
+<ol>
+<li>
+<p>Open the <strong>Ex1/Begin</strong> project in Unity.</p>
+
+<blockquote>
+<p><strong>Note:</strong> If using default setup at the event, the folder is at
+<strong>C:\labs\CodeLabs-GameDev-2-UnityWin10\Source\Ex1\Begin</strong>.</p>
+</blockquote>
+</li>
+<li><p>In Unity, let's prepare our project so we can build a player targeting UWP. You can do this via <strong>File-&gt; Build Settings</strong> menu.  Don't click <strong>Build</strong> yet, we need to configure a few options.</p></li>
+<li><p>In the <strong>Build Settings</strong> dialog box, select <strong>Universal 10</strong> as target SDK.</p></li>
+<li><p>Select <strong>XAML</strong> as the <strong>UWP Build Type</strong>. XAML is used for most games  as it allows you to bring XAML UI (like Web Views, and dialogs) into your game. In this case, we need XAML UI for showing ads in a later task.   </p></li>
+<li>
+<p>For this exercise, make sure you select the option to Export <strong>Unity C# projects</strong>; we will explain what this option does when we walk through the output from the build step.</p>
+
+<p><img src="./Images/BuildAction.png" alt="Build Action" title="Build Action"></p>
+
+<p><em>Build Action</em></p>
+</li>
+<li><p>Before we click <strong>Build</strong>, we should also set our Player Settings. Click the <strong>Player Settings</strong> button.</p></li>
+<li>
+<p>In player settings you can configure the name of your app, the splash screen, icons and tiles, orientation, rendering options, sensors, capabilities, and many other options. Explore all of these and feel free to change them.</p>
+
+<p><img src="./Images/PlayerSettings.png" alt="Player Settings" title="Player Settings"></p>
+
+<p><em>Player Settings</em></p>
+</li>
+<li>
+<p>The setting that we are after in our case is under <strong>capabilities</strong> in the <strong>Publishing Settings</strong> section. <a href="https://msdn.microsoft.com/en-us/library/windows/apps/br211422.aspx">Capabilities</a> is a UWP concept, it declares an intent to use a protected resource.  For our project, we need to add the <strong>InternetClient</strong> capability so that later when we show ads these can be downloaded from the internet.</p>
+
+<p><img src="./Images/PlayerSettingsCapabilities.png" alt="Player Settings Capabilities" title="Player Settings Capabilities"></p>
+
+<p><em>Player Settings Capabilities</em></p>
+</li>
+<li><p>When done configuring player settings,  click <strong>Build</strong>. You will be prompted to select a folder you are building to. Give it any project name. If you want to mimic our solution (not required) you can call it <em>Win10Solution</em>.</p></li>
+<li><p>The build process will take a few minutes, when it is completed, Unity will launch a <strong>Windows Explorer</strong> window to your build folder. Locate the <strong>Tanks.sln</strong> in that folder and open it in Visual Studio.</p></li>
+<li>
+<p>Let's now explore the solution and projects that Unity created.</p>
+
+<p><img src="./Images/VisualStudioSolutionExplorer.png" alt="Visual Studio Solution Explorer" title="Exported Projects"></p>
+
+<p><em>Exported Projects</em></p>
+
+<ul>
+<li><p><strong>Tanks (Universal Windows)</strong> is our game; this is the project we will submit to the Windows Store.</p></li>
+<li><p><strong>Tanks (Universal Windows)</strong> references <strong>Assembly-CSharp.dll</strong>, which is the game generated by Unity. This assembly has all our MonoBehaviours and game logic.</p></li>
+<li><p>The data folder in Tanks project is where Unity put the projects' resources, assets, levels, etc. </p></li>
+<li><p><strong>Package.appxmanifest</strong> is the manifest (configuration file) for our project. In this file, you will find what we configured under <strong>Player Settings</strong> and <strong>Build Settings</strong> in the Unity Editor. There are more settings here, so do explore it. </p></li>
+<li><p>The <strong>Assembly-Csharp</strong> and <strong>Assemby-CSharp</strong> first pass projects are  what Unity usually builds in the <strong>Editor</strong>. In this case, Unity generated them because we chose the option to create <strong>Unity C# projects</strong>. These will be handy for today as they allow us to recompile Assembly-CSharp (our game logic) from within Visual Studio without having to rebuild from Unity. Of course that works if all we modify is the code; if we modify scenes or add resources or change player or build settings, then we must rebuild from Unity. If you rebuild from Unity to the same build folder, Unity will not override the code and settings for Tanks (Universal Windows) project. Unity preserves these so that any changes you make to the project are not overwritten.</p></li>
+</ul>
+</li>
+</ol>
+
+<blockquote>
+<p><strong>Note</strong>: Since AssemblyCSharp has our game, that is where all files we edit today will be. There are two folders to look after: </p>
+
+<ul>
+<li>
+<em>Complete</em> is the folder that has the original game. It is called Complete as that is the folder at end of Unity's tutorial. Our <em>GameManager</em> is there; we did tweak this file beyond Unity's tutorial. </li>
+<li>
+<em>CodeLab</em> has a few scripts we added for the codelab. Our <em>SocialDialogManager</em> and the Microsoft Ads scripts are there. </li>
+</ul>
+</blockquote>
+
+<h4>
+<a id="lets-see-it" class="anchor" href="#lets-see-it" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Let's see it!</h4>
+
+<p>Our game is already functional.</p>
+
+<ol>
+<li><p>To run it, change the target platform in Visual Studio from <strong>ARM</strong> to <strong>x86</strong>.</p></li>
+<li><p>Press <strong>F5</strong> or click on the <strong>Local Machine</strong> button in Visual Studio to start the game. </p></li>
+</ol>
+
+<p>Of course, our game right now has no Windows integration; we will add that in our next steps. </p>
+
+<p><a name="Exercise2"></a></p>
+
+<h3>
+<a id="exercise-2-using-unitys-native-integration-helper-libraries" class="anchor" href="#exercise-2-using-unitys-native-integration-helper-libraries" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Exercise 2: Using Unity's native integration helper libraries</h3>
+
+<p>For native integration, Unity includes a few wrappers for Windows Store features like tiles, toast notifications, and launchers.  These features are in the <strong>UnityEngine.WSA</strong> namespace.</p>
+
+<p>Let's use the UnityEngine.WSA.Launcher APIs, to launch Help for our game, and to add a "rate us" feature to our game.</p>
+
+<ol>
+<li>
+<p>In <strong>GameManager.cs</strong> (located in Complete\Scripts\Managers folder), there is already an Input handler for F1 key in the Update loop, so we can add the code to launch our help screen in the browser.</p>
+
+<div class="highlight highlight-source-cs"><pre><span class="pl-k">void</span> Update ()
+{
+    <span class="pl-k">if</span> (Input.GetKeyUp(KeyCode.F1))
+    {
+        UnityEngine.WSA.Launcher.LaunchUri(<span class="pl-s"><span class="pl-pds">"</span>https://github.com/Microsoft-Build-2016/CodeLabs-GameDev-2-UnityWin10/blob/master/Images/TanksHelp.jpg<span class="pl-pds">"</span></span>,
+            <span class="pl-c1">false</span>);
+    }
+    ...
+}</pre></div>
+</li>
+<li>
+<p>This same technique can be used to implement the 'Rate us' functionality. There is already a "Rate us" button in the game. For demo purposes, it is coded to come up every 4th time you finish a round. So all we have to do is add code to the <strong>OnRateClicked</strong> event handler in the <strong>SocialDialogManager</strong> Behaviour (this file is located in CodeLab\Scripts\SocialDialogManager folder).</p>
+
+<div class="highlight highlight-source-cs"><pre><span class="pl-k">public</span> <span class="pl-k">void</span> OnRateClicked ()
+{
+    UnityEngine.WSA.Launcher.LaunchUri(<span class="pl-s"><span class="pl-pds">"</span>ms-windows-store:REVIEW?PFN=Microsoft.Channel9_8wekyb3d8bbwe<span class="pl-pds">"</span></span>,
+                            <span class="pl-c1">false</span>);
+    DismissDialog();
+}</pre></div>
+</li>
+<li>
+<p>For our final example of this technique, and to illustrate a little more immersive integration, let's add live tiles to our game.  At the end of each round, we can add a teaser message so users can come back if they quit game in middle of a round. Our <strong>GameManager</strong> already has a <strong>SetLiveTile</strong> method that gets called at end of each round.  This method will update the text on our main live tile, and set an image to scroll with the tilea to make it pop with more interactivity.   </p>
+
+<div class="highlight highlight-source-cs"><pre><span class="pl-k">void</span> SetLiveTile ( <span class="pl-k">string</span> textmessage )
+{
+     UnityEngine.WSA.Tile.main.Update( <span class="pl-s"><span class="pl-pds">"</span>ms-appx:///Data/StreamingAssets/TanksIcon_150x150.png<span class="pl-pds">"</span></span> ,
+            <span class="pl-s"><span class="pl-pds">"</span>ms-appx:///Data/StreamingAssets/TanksIcon_310x150.png<span class="pl-pds">"</span></span>, <span class="pl-k">string</span>.Empty, textmessage);
+}</pre></div>
+</li>
+</ol>
+
+<h4>
+<a id="lets-see-it-1" class="anchor" href="#lets-see-it-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Let's see it!</h4>
+
+<p>We have added three features to our game. Let's now go see them in action!</p>
+
+<ol>
+<li>Viewing the Help file is easy. Any time during the game, press <strong>F1</strong>.</li>
+<li>To see the <strong>social dialog</strong> that prompt the user to rate the game, just play a few rounds. At the end of a round you will be prompted with a dialog to rate the app.</li>
+<li>The live tile is getting updated at end of each round; there is no UI to ask user if they want to update tile, etc. so play a round and if you want to see the code, set a break point in <strong>SetLiveTile</strong>.
+To see the live tile, you do need to have it pinned to your Start menu. You can pin the tile before, or after you have run the game.<br>
+</li>
+</ol>
+
+<h4>
+<a id="discussion-around-unity-wsa-apis" class="anchor" href="#discussion-around-unity-wsa-apis" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Discussion around Unity WSA APIs</h4>
+
+<p>These UnityEngine.WSA.* APIs are convenient and easy to use. You did not notice this yet (we will cover it next), but there are threading requirements the API is abstracting and handling for you, we will explore these in our next exercise. </p>
+
+<p>Unfortunately, the UnityEngine.WSA APIs do not handle all native integration scenarios. No worries though, there are more options, let's explore our next one: writing inline code in your Unity project to access WinRT APIs.    </p>
+
+<p><a name="Exercise3"></a></p>
+
+<h3>
+<a id="exercise-3-adding-winrt-inline-code-to-a-unity-game" class="anchor" href="#exercise-3-adding-winrt-inline-code-to-a-unity-game" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Exercise 3: Adding WinRT inline code to a Unity game</h3>
+
+<p>When Unity games target Windows Store (with a .NET backend, not IL2CPP), they are compiled using the .NET compiler and therefore can access WinRT APIs; as part of their build process, Unity links against WinRT libraries.  </p>
+
+<p>To inline WinRT code into your Unity project all you need to do is protect yourself so that Unity does not try to compile that code when targeting other platforms; for this, we will use the NETFX_CORE pre-processor.</p>
+
+<p>Unity's documentation has more guidance on <a href="http://docs.unity3d.com/Manual/PlatformDependentCompilation.html">pre-processors defines for platform specific compilation</a>.  For today' exercises we will use these directives:</p>
+
+<ul>
+<li>
+<strong>NETFX_CORE</strong> to filter for code that compiles against .NET Coreand links to WinRT.</li>
+<li>
+<strong>WINDOWS_UWP</strong> to ensure code is used only on Windows 10, when APIs are Windows 10 specific.</li>
+<li>
+<strong>UNITY_EDITOR</strong> to filter out code that only runs in the editor.</li>
+</ul>
+
+<p>To exercise inlining code, we want to add support to enter and exit full screen mode when the user presses F11 in our game. The game is already listening for keyboard input in the <strong>Update</strong> loop in <strong>GameManager.cs</strong>, so we can add the code to enter/exit full screen there:</p>
+
+<div class="highlight highlight-source-cs"><pre><span class="pl-k">else</span> <span class="pl-k">if</span> (Input.GetKeyUp (KeyCode.F11))
+{
+#if <span class="pl-en">NETFX_CORE &amp;&amp; WINDOWS_UWP</span>
+     <span class="pl-c">//Dispatch from Unity App thread to Windows UI Thread</span>
+     UnityEngine.WSA.Application.InvokeOnUIThread( ()=&gt;
+     {
+          <span class="pl-k">var</span> appView = Windows.UI.ViewManagement.ApplicationView.GetForCurrentView();
+          <span class="pl-k">if</span> (appView.IsFullScreen)
+                appView.ExitFullScreenMode();
+          <span class="pl-k">else</span>
+                appView.TryEnterFullScreenMode();
+     } , <span class="pl-c1">false</span>);
+#endif
+}</pre></div>
+
+<p>Here are the relevant details to notice from our snippet:</p>
+
+<ul>
+<li>It is inside a <code>#if NETFX_CORE &amp;&amp; WINDOWS_UWP</code> so other platforms don't call into it and Unity does not try to compile when targeting other platforms.</li>
+<li>It is inside a delegate invoked by <strong>UnityEngine.WSA.Application.InvokeOnUIThread</strong>. Two of the most useful functions in the <strong>UnityEngine.WSA</strong> namespaces are:
+
+<ul>
+<li>
+<strong>Application.InvokeOnUIThread</strong> used to dispatch a call from Unity's app thread to Windows' UI thread</li>
+<li>
+<strong>Application.InvokeOnAppThread</strong> used to dispatch calls from any thread to Unity's app thread.</li>
+</ul>
+</li>
+</ul>
+
+<p>In our case, <strong>ApplicationView.TryEnterFullScreenMode</strong> requires that it be called from the UI thread, that is why we dispatched the call, but not all WinRT calls need to be dispatched. For example, scheduled local toast notifications (which can be used to reengage users) can run from the Unity App thread and doesn't need dispatching.   Our game is already stubbed to schedule a toast notification, it has a <strong>ScheduleReEngagement</strong> method in GameManager.cs, where we can add some notification code: </p>
+
+<div class="highlight highlight-source-cs"><pre><span class="pl-k">void</span> ScheduleReEngageToast()
+{
+    <span class="pl-k">if</span> (needsSessionToast)
+    {
+        <span class="pl-k">string</span> invite = <span class="pl-s"><span class="pl-pds">"</span>Your ammo is piling up. Let's battle!<span class="pl-pds">"</span></span>;
+        DateTime dueTime = DateTime.Now.AddSeconds(<span class="pl-c1">40</span>);
+
+#if <span class="pl-en">NETFX_CORE  </span>
+        <span class="pl-k">var</span> notificationXmlDoc = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastText01);
+        <span class="pl-k">var</span> textNodeList = notificationXmlDoc.GetElementsByTagName(<span class="pl-s"><span class="pl-pds">"</span>text<span class="pl-pds">"</span></span>);
+        <span class="pl-k">if</span> (textNodeList.Count &gt; <span class="pl-c1">0</span>)
+        {
+            textNodeList[<span class="pl-c1">0</span>].AppendChild(notificationXmlDoc.CreateTextNode(invite));
+            <span class="pl-k">var</span> toast = <span class="pl-k">new</span> ScheduledToastNotification(notificationXmlDoc, dueTime);
+            toast.Id = (++toastId).ToString();
+            ToastNotificationManager.CreateToastNotifier().AddToSchedule(toast);
+        }
+#endif 
+        needsSessionToast = <span class="pl-c1">false</span>;
+    } 
+}</pre></div>
+
+<p>Notice that in this case, we only need a <code>NETFX_CORE</code> pre-processor, since these APIs work in Windows 8.x too. The full screen API we used earlier is Windows 10 only, that is why we had <code>NETFX_CORE</code> &amp;&amp; <code>WINDOWS_UWP</code>.   That said, for the code above to compile you need to add the right using statements near the top of GameManager.cs  </p>
+
+<div class="highlight highlight-source-cs"><pre>#if <span class="pl-en">NETFX_CORE</span>
+<span class="pl-k">using</span> <span class="pl-en">Windows.UI.Notifications</span>;
+<span class="pl-k">using</span> <span class="pl-en">Windows.Data.Xml.Dom</span>;   
+#endif</pre></div>
+
+<h4>
+<a id="lets-see-it-2" class="anchor" href="#lets-see-it-2" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Let's see it!</h4>
+
+<p>To toggle in and out of full screen mode, just run the game and press <strong>F11</strong>. 
+If you are curious, comment out the dispatcher call and call TryEnterFullScreenMode without dispatching and see what happens (ahem, crash, ahem).   </p>
+
+<p>To see the toast notification,  just win a battle in the game and wait 40 seconds. You can even exit the game, the notification will fire even when game is not running. This way you could re-engage a user who has not played your game in a few days. </p>
+
+<h4>
+<a id="discussion-around-inlining-code" class="anchor" href="#discussion-around-inlining-code" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Discussion around inlining code</h4>
+
+<p>You have now seen how easy it is to inline WinRT code. Just understand and pay attention to your threading models, and you will be fine; it works great for WinRT and .NET APIs. However, what about calling custom libraries (such as an analytics library, or an ads SDK)? Of course, Unity allows that, via plugins. Let's cover that next.</p>
+
+<p><a name="Exercise4"></a></p>
+
+<h3>
+<a id="exercise-4-configuring-a-reference-to-a-unity-plugin" class="anchor" href="#exercise-4-configuring-a-reference-to-a-unity-plugin" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Exercise 4: Configuring a reference to a Unity plugin</h3>
+
+<p>This section discusses referencing a managed Unity plugin; it focuses on the Windows' specific options to configure it and reference it. For practical purposes here, let's summarize a plugin as a .NET assembly or WinRT component (winmd) that we need to reference from within our Unity code.</p>
+
+<p>If you want to dive deeper into plugins, please see this <a href="http://docs.unity3d.com/Manual/Plugins.html">reference</a> in Unity's documentation.</p>
+
+<ol>
+<li><p>Go back into <strong>Unity Editor</strong>.</p></li>
+<li>
+<p>Add a reference to Vungle's Unity Package, which includes a managed plugin. To do this, select <strong>Assets -&gt; Import  Package -&gt; Custom Package</strong>.</p>
+
+<p><img src="./Images/UnityEditorImportCustomPackage.png" alt="Import Custom Package in Unity Editor " title="Import Custom Package in Unity Editor"></p>
+
+<p><em>Import Custom Package in Unity Editor</em></p>
+</li>
+<li><p>Navigate to the folder where your <strong>VungleSDK.UnityPackage</strong> is located. If you are using the one pulled with this repo, it is in the <strong>Source/ExtraFiles/Vungle</strong> folder.</p></li>
+<li><p>Click <strong>Open</strong> to add the package to our Unity project.</p></li>
+<li>
+<p>After selecting the package, you will see the <strong>Unity Import Dialog</strong>.  In Vungle's case, they ship code for all platforms (iOS, Android, Windows). This is fine for us. Click <strong>Import</strong> to import all the files. Let's now review the important ones (for Windows Store and Windows Phone) configurations; the files are in the Plugins folder. </p>
+
+<ul>
+<li><p>Notice the files are under a <strong>Plugins/Metro</strong> folder structure. Unity follows a specific folder hierarchy and naming convention, with a folder name for each different target platform. Starting with Unity 5, the folder hierarchy is not required, as Unity allows you to configure it manually via the new Plugin inspector, but for ease of use, it is still handy to follow. You can find out more about these folder names in Unity's <a href="http://docs.unity3d.com/Manual/PluginInspector.html">Plugin Inspector documentation</a>.</p></li>
+<li><p>There is a <strong>UWP</strong> folder. This is used for plugins for Universal (Windows 10) Projects.</p></li>
+<li><p>There is a <strong>WindowsPhone81</strong> folder, since Vungle supports Windows Phone 8.1 too. We are not going to need that today, so delete that Windows Phone 81 folder and its contents.</p></li>
+</ul>
+</li>
+<li>
+<p>Let's now configure the rest of our SDK references, pay close attention as there is a lot details here. Go to the <strong>Plugins</strong> Folder and notice the <strong>VungleSDKProxy.dll.</strong> This DLL since is at the root of the plugins folder right now is applicable to all platforms. Click the dll to see it's import settings, ensure the plugin's selected platform is <strong>Editor</strong> (for this, uncheck the <em>Any Platform</em> box and check <em>Editor</em>). This will be used only when running in the Editor. Click <strong>Apply</strong> after you make your changes. </p>
+
+<p><img src="./Images/VungleSDKProxy.png" alt="VungleSDKProxy Import Settings" title="VungleSDKProxy Import Settings"></p>
+
+<p><em>VungleSDKProxy Import Settings</em></p>
+</li>
+<li>
+<p>Next, we can go into the <strong>Plugins\Metro</strong> folder and configure the <strong>VungleSDKProxy.winmd</strong>.</p>
+
+<ul>
+<li><p>This winmd needs to target <strong>WSAPlayer</strong> (the platform for Windows Store).</p></li>
+<li><p>Since we are only targeting UWP, select <strong>UWP</strong> under <em>SDK</em>.</p></li>
+<li><p>The <em>Scripting Backend</em> should be <strong>Dotnet</strong></p></li>
+<li><p>Check the <strong>Don't process</strong> checkbox.  Don't process is used to tell Unity that it should not patch the assembly. Unity needs to do extra processing to patch assemblies that have classes that need to be serialized in Unity; for most managed plugins that just add native integration, the Don't process should be checked as these assemblies rarely contain Unity serializable objects. To be precise, the setting is not required since we have a .winmd and Unity knows not to process these, but i wanted to explain the setting, so leave it checked. It this was a dll, then the setting would be needed. </p></li>
+<li><p>For placeholder, point it to the VungleSDKProxy dll in the <strong>Plugins</strong> folder. This tells Unity to use that placeholder assembly when compiling to run in the Unity editor. We need placeholder assemblies because the Unity Editor is running Mono, it can't load .NET 4.5 assemblies (or WinMDs). Placeholders mimic the API signatures of the real assembly we want to use, but placeholders are compiled against .NET 3.5. that way every thing compiles within the editor (using placeholder assembly), and it also compiles when building to target UWP (using the target assembly ). </p></li>
+<li>Here is our complete settings for our VungleSDKProxy in Plugins\Metro, so you can verify you made all the changes. Again, click <em>Apply</em> when you are done. </li>
+</ul>
+
+<p><img src="./Images/VungleSDKProxyPluginsMetro.png" alt="VungleSDKProxy.winmd Import Settings" title="VungleSDKProxy.winmd Import Settings"></p>
+
+<p><em>VungleSDKProxy.winmd Import Settings</em></p>
+</li>
+<li><p>Next, delete the <strong>VungleSDK.winmd</strong> file in the <strong>Plugins\Metro</strong> folder. The Vungle package includes this extra file to workaround an issue in earlier versions of Unity, but for 5.3.3 and later we don't need it. Do pay attention to the folder and make sure you only delete the one in Plugins\Metro, not the one in Plugins\Metro\UWP. </p></li>
+<li>
+<p>Next, we can configure <strong>VungleSDK.winmd</strong> in <strong>Plugins\Metro\UWP</strong> using these settings. </p>
+
+<p><img src="./Images/VungleSDKPluginsMetroUWP.png" alt="VungleSDK for UWP Import Settings" title="VungleSDK for UWP Import Settings"></p>
+
+<p><em>VungleSDK for UWP Import Settings</em></p>
+
+<blockquote>
+<p><strong>Note 1:</strong> If you are wondering why VungleSDK does not have a placeholder, it does not need it. All possible calls to this assembly are 'brokered' through VungleSDKProxy, so we don't need a placeholder dll for this.  </p>
+
+<p><strong>Note 2:</strong> If you want more details around these plugin import settings, Unity's documentation has a good overview of the <a href="http://docs.unity3d.com/Manual/windowsstore-plugins.html">import settings</a>.</p>
+</blockquote>
+</li>
+<li>
+<p>By adding the Vungle plugin to our Unity project we have changed what Unity needs to compile, so before we go further, we should <strong>Build</strong> within Unity like we did on our first task. </p>
+
+<blockquote>
+<p>Note: Unity is going to re-create our projects (.csproj files) for our three projects since it needs to update the references to these so they include VungleSDK.   If you get a prompt in Visual Studio to reload the projects, accept the prompt, by clicking <strong>Reload All</strong>. </p>
+</blockquote>
+</li>
+<li><p>After Unity builds, confirm the new <em>Tanks.csproj</em> has a reference to <strong>VungleSDK</strong> and <strong>VungleSDKProxy</strong>; if that looks right, rebuild all just to ensure it is all working correctly.</p></li>
+<li><p>Now that we have our references configured within Unity and have recompiled, we can call the code to show the ads. Let's go back to Visual Studio.</p></li>
+<li><p>To save you a little typing time (and since the logic is simple and not critical to Windows integration, the code is written, but excluded via a <code>#if SHOW_VUNGLE_ADS</code> pre-processor. Go to the top of the <strong>GameManager.cs</strong> file, and uncomment out the <code>#define SHOW_VUNGLE_ADS</code> line and let's now review how Vungle is getting called. </p></li>
+<li>
+<p>In the <strong>Start</strong> function,  we initialize Vungle and subscribe to adCompleted event.</p>
+
+<div class="highlight highlight-source-cs"><pre>Vungle.init(<span class="pl-s"><span class="pl-pds">"</span>com.prime31.Vungle<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>vungleTest<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>vungleTest<span class="pl-pds">"</span></span>);
+Vungle.onAdFinishedEvent += OnAdFinished;  </pre></div>
+</li>
+<li><p>Then, within <strong>OnAdFinished</strong> event handler, we call <strong>OnAdCompleted()</strong>.</p></li>
+<li>
+<p>Within <strong>OnAdCompleted</strong> we will reset the volume (since game background music gets muted prior to playing the ads). This <strong>OnAdCompleted</strong> event is worth looking at because it demonstrates using <strong>UnityEngine.WSA.Application.InvokeOnAppThread()</strong> to unmute the background music.</p>
+
+<div class="highlight highlight-source-cs"><pre><span class="pl-k">void</span> OnAdCompleted()
+{
+     m_isDisplayingAd = <span class="pl-c1">false</span>;
+     <span class="pl-k">if</span> (!UnityEngine.WSA.Application.RunningOnAppThread())
+     {
+          UnityEngine.WSA.Application.InvokeOnAppThread(() =&gt;
+          {
+                ToggleMute(<span class="pl-c1">false</span>);
+          }, <span class="pl-c1">false</span>);
+     }
+     <span class="pl-k">else</span>
+          ToggleMute(<span class="pl-c1">false</span>);
+}</pre></div>
+</li>
+<li><p>In GameManager's <strong>RoundEnding</strong> function we call the <strong>ShowAd</strong> method, which first mutes the background music, then calls <strong>Vungle.showAd</strong> and sets a flag so the game loop knows to wait for ad to complete (<strong>m_isDisplayingAd</strong>).</p></li>
+</ol>
+
+<p>With that, we are now ready to test ads in our game.</p>
+
+<blockquote>
+<p>Note: If after uncommenting the #define SHOW_VUNGLE_ADS you get an error that looks like this: "The type or namespace name AdfinishedEventArgs could not be found" it means Unity did not refresh the reference to Assembly-CSharp-firstpass.dll. Implement this workaround: <br> 
+    1. Expand Assembly-CSharp project's references. <br> 
+    2. Look at the properties for the Assembly-CSharp-firstpass reference and locate the Path property.  If you are using the //build configuration, the path is c:\labs\CodeLabs-GameDev-2-UnityWin10\Source\Ex1\Begin\UWP\Assembly-CSharp\bin\x86\Debug\Assembly-CSharp-firstpass.dll.  <br> 
+    3. Once you have the path, in Windows Explorer, navigate to the containing folder and delete that dll.  <br> 
+    4. Rebuild in Visual Studio. <br> </p>
+</blockquote>
+
+<h4>
+<a id="lets-see-it-3" class="anchor" href="#lets-see-it-3" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Let's see it!</h4>
+
+<p>To see Vungle ads, just run the game and win two rounds. After the second round, the ad will show up.  </p>
+
+<h4>
+<a id="discussion-around-plugin-configuration" class="anchor" href="#discussion-around-plugin-configuration" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Discussion around plugin configuration</h4>
+
+<p>You have now seen how to integrate a managed Unity plugin or a WinRT component into your Unity project. Plugins are a critical part of code  reuse and a frequent source of integration  for games, as most games leverage shared analytics, ads, social networks, etc. All of these are powered by reusable plugins.</p>
+
+<p><a name="Exercise5"></a></p>
+
+<h3>
+<a id="exercise-5-taking-a-bridge-approach-to-integration" class="anchor" href="#exercise-5-taking-a-bridge-approach-to-integration" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Exercise 5: Taking a bridge approach to integration</h3>
+
+<p>In the previous example, we consumed a plugin from within Unity by importing the binary (<em>VungleSDK.winmd</em>) into Unity and linking to it. Sometimes, we don't want to do this due to relationships or dependencies between the host app (in this case our Tanks UWP project) and the code we want to run in Unity; or maybe, including the binaries in Unity would be too cumbersome -often this happens if you have an SDK that ships as a nuget package and has a lot of platform dependencies, you end up needing ARM/x86/x64 dlls in Unity). For those situations, we use a standard software development <a href="https://en.wikipedia.org/wiki/Bridge_pattern">bridge pattern</a> where we can put an abstract defintion of what we want to do (most often an interface) on the Unity side and then leave the implementation to the target host project. Let's illustrate that by replacing our Vungle ads with Microsoft ads on our project.</p>
+
+<p>The code has already been typed for you, it is just hidden under <code>#if SHOW_MS_ADS</code> pre-processors, so to run this scenario, comment out the <code>#define SHOW_VUNGLE_ADS</code> at the top of game manager and uncomment out the <code>#define SHOW_MS_ADS</code>.</p>
+
+<div class="highlight highlight-source-cs"><pre><span class="pl-c">// #define SHOW_VUNGLE_ADS  </span>
+#define <span class="pl-en">SHOW_MS_ADS</span></pre></div>
+
+<p>Let's now review the implementation details on the Unity side.  </p>
+
+<ol>
+<li>
+<p>We first need an abstraction to the APIs we want to call. In this case, there is an interface typed for us in <strong>CodeLab\MSAdsBridge\IMicrosoftAdsBridge.cs</strong>.</p>
+
+<div class="highlight highlight-source-cs"><pre><span class="pl-k">public</span> <span class="pl-k">interface</span> <span class="pl-en">IInterstittialAd</span> : <span class="pl-k">IDisposable</span>
+{
+     <span class="pl-k">void</span> <span class="pl-en">AddCallback</span>(<span class="pl-k">AdCallback</span> <span class="pl-smi">type</span>, Action&lt;object&gt; cb);
+     <span class="pl-k">void</span> <span class="pl-en">ClearCallback</span>(<span class="pl-k">AdCallback</span> <span class="pl-smi">type</span>);
+
+     <span class="pl-k">void</span> <span class="pl-en">RequestAndShow</span>(<span class="pl-k">string</span> <span class="pl-smi">appId</span>, <span class="pl-k">string</span> <span class="pl-smi">adUnitId</span>);
+
+     <span class="pl-k">void</span> <span class="pl-en">Request</span>(<span class="pl-k">string</span> <span class="pl-smi">appId</span>, <span class="pl-k">string</span> <span class="pl-smi">adUnitId</span>, <span class="pl-k">AdType</span> <span class="pl-smi">type</span>);
+
+     <span class="pl-k">void</span> <span class="pl-en">Show</span>();
+     InterstitialAdState <span class="pl-en">State</span> { <span class="pl-k">get</span>; }
+}</pre></div>
+</li>
+<li>
+<p>Next, we need a way to connect our abstraction to our concrete implementation, in this case a factory class.</p>
+
+<div class="highlight highlight-source-cs"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">MicrosoftAdsBridge</span>
+{
+     <span class="pl-k">public</span> <span class="pl-k">static</span> IInterstitialAdFactory <span class="pl-en">InterstitialAdFactory</span> { <span class="pl-k">get</span>; <span class="pl-k">set</span>; }
+}
+
+<span class="pl-k">public</span> <span class="pl-k">interface</span> <span class="pl-en">IInterstitialAdFactory</span>
+{
+     IInterstittialAd <span class="pl-en">CreateAd</span>();
+
+     IInterstittialAd <span class="pl-en">CreateAd</span>( Action&lt;object&gt; readyCallback,
+                                Action&lt;object&gt; completedCallback,
+                                Action&lt;object&gt; cancelledCallback,
+                                Action&lt;object&gt; errorCallback );
+}</pre></div>
+</li>
+<li>
+<p>Within Unity, we just check to see if we have a valid Factory when we want to instantiate our ads. We do this in <strong>GameManager</strong>'s <strong>Start</strong> method like we did for Vungle ads. The most important code here is the check to see if we have a factory.</p>
+
+<div class="highlight highlight-source-cs"><pre><span class="pl-k">if</span> (Microsoft.UnityPlugins.MicrosoftAdsBridge.InterstitialAdFactory != <span class="pl-c1">null</span>)
+{
+     m_showAds = <span class="pl-c1">true</span>;
+     m_MicrosoftAd = Microsoft.UnityPlugins.MicrosoftAdsBridge.InterstitialAdFactory.CreateAd();
+     m_MicrosoftAd.AddCallback(Microsoft.UnityPlugins.AdCallback.Completed, OnMSAdCompleted);
+     m_MicrosoftAd.AddCallback(Microsoft.UnityPlugins.AdCallback.Cancelled, OnMSAdCancelled);
+     m_MicrosoftAd.AddCallback(Microsoft.UnityPlugins.AdCallback.Error, OnMSAdError);
+     m_MicrosoftAd.Request(MicrosoftAdsAppId, NextMicrosoftAd, Microsoft.UnityPlugins.AdType.Video);
+}</pre></div>
+
+<p>Once ad is initialized, we can play the video on the same ShowAd method as before.</p>
+
+<div class="highlight highlight-source-cs"><pre><span class="pl-k">if</span> (m_MicrosoftAd != <span class="pl-c1">null</span>)
+{
+     <span class="pl-k">if</span> (m_MicrosoftAd.State == Microsoft.UnityPlugins.InterstitialAdState.Ready)
+          m_MicrosoftAd.Show();
+     <span class="pl-k">else</span>
+          m_MicrosoftAd.RequestAndShow(MicrosoftAdsAppId, NextMicrosoftAd);
+}</pre></div>
+</li>
+<li>
+<p>As you can see, with the above we have code to instantiate ads and play ads in Unity, yet we have not added a reference to the Microsoft Ads SDK. Unity is completely abstracted/isolated from the SDK. We now need to add the implementation on the UWP project. In Visual Studio, in our Tanks project, add a reference to the Microsoft Universal Ads SDK.</p>
+
+<p><img src="./Images/VisualStudioAddAdsReference.png" alt="Add Ads SDK Reference in Visual Studio" title="Add Ads SDK Reference in Visual Studio"></p>
+
+<p><em>Add Ads SDK Reference in Visual Studio</em></p>
+</li>
+<li>
+<p>Next, we need to add the implementation of our IInterstitialAd interface. Right click on the Tanks project in Solution Explorer, Select <strong>Add</strong>-&gt;<strong>Existing Item</strong> and navigate to the ExtraFiles folder in this repo and select the <strong>MSAdsBridge\MicrosoftAdsBridge.cs</strong> file.</p>
+
+<blockquote>
+<p>If you are using a //build PC, the ExtraFiles folder is at  C:\labs\CodeLabs-GameDev-2-UnityWin10\Source\ExtraFiles. </p>
+</blockquote>
+</li>
+<li>
+<p>Finally, add the class factory so that the Unity code knows how to instantiate ads. This can be done anywhere, but for this kind of implementation, I always prefer to do it in the <strong>App.xaml.cs</strong>  <strong>InitializeUnity</strong>; that feels like a good place to ensure we don't run into a race condition later.</p>
+
+<div class="highlight highlight-source-cs"><pre>...
+<span class="pl-c">// right after appCallbacks.SetAppArguments(args); add our code..</span>
+
+Microsoft.UnityPlugins.MicrosoftAdsBridge.InterstitialAdFactory
+     = <span class="pl-k">new</span> Microsoft.UnityPlugins.MicrosoftAdsFactory();</pre></div>
+</li>
+</ol>
+
+<h4>
+<a id="lets-see-it-4" class="anchor" href="#lets-see-it-4" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Let's see it!</h4>
+
+<p>To see Microsoft ads in action, just run the game and win two rounds. After the second round, the ad will show up.  </p>
+
+<h4>
+<a id="discussion-around-bridge-technique" class="anchor" href="#discussion-around-bridge-technique" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Discussion around bridge technique</h4>
+
+<p>The bridge pattern can be handy to avoid lots of platform specific dependencies (if you have a winmd that depends on native libraries that will be different for ARM/x86/x64) it can be easier to do it on the UWP side than on Windows.  It is also easier to manage nuget references that auto-update themselves and can be restored automatically.  This example mostly should give you context on the many options you have to integrate Unity games with native WinRT functionality; referencing .NET assemblies, nuget packages, etc. It all works, since we are just using Visual Studio to manage app and nuget references.  </p>
+
+<p><a name="Summary"></a></p>
+
+<h2>
+<a id="summary" class="anchor" href="#summary" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Summary</h2>
+
+<p>Congratulations!!  You have now successfully completed our lab and should be deeply familiar with how to add native functionality to your Unity game.</p>
+
+<p>There is one topic we did not cover in this lab write-up (due to lack of time).
+Unity's <a href="http://unity3dforge.com/documentation/Manual/windowsstore-plugins.html">Windows Store plugins documentation</a> summarizes succinctly what you need to do, and if you want real-world examples with source code included, you can find plenty at <a href="https://github.com/microsoft/unityplugins">https://github.com/microsoft/unityplugins</a> repo.</p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/grazies/CodeLabs-GameDev-2-UnityWin10">Codelabs-gamedev-2-unitywin10</a> is maintained by <a href="https://github.com/grazies">grazies</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
